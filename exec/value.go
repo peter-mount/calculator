@@ -53,6 +53,23 @@ func (v *Value) IsNull() bool {
   return v.varType == VAR_NULL
 }
 
+func (v *Value) IsZero() bool {
+  switch v.varType {
+    case VAR_NULL:
+      return true
+    case VAR_BOOL:
+      return !v.boolVal
+    case VAR_INT:
+      return v.intVal == 0
+    case VAR_FLOAT:
+      return v.floatVal == 0.0
+    case VAR_STRING:
+      return v.stringVal == ""
+    default:
+      return false
+  }
+}
+
 // Bool returns the value as a bool
 func (v *Value) Bool() bool {
   switch v.varType {

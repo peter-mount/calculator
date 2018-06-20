@@ -12,7 +12,7 @@ var logicFunctions = FuncMap{
   "&&":       FuncMapEntry{ andHandler,               BinaryOp },
   "or":       FuncMapEntry{ orHandler,                BinaryOp },
   "||":       FuncMapEntry{ orHandler,                BinaryOp },
-  "not":      FuncMapEntry{ notHandler,               BinaryOp },
+  "not":      FuncMapEntry{ notHandler,               UnaryOp  },
 }
 
 func equalHandler( m *Context, n *Node ) error {
