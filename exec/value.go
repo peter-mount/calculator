@@ -4,6 +4,7 @@ import (
   "strconv"
 )
 
+// The types of a Value returned by Type()
 const (
   _ = iota
   VAR_NULL
@@ -23,7 +24,10 @@ type Value struct {
 }
 
 var nullValue Value = Value{ varType: VAR_NULL }
+var falseValue Value = Value{ varType: VAR_BOOL, boolVal: false }
+var trueValue Value = Value{ varType: VAR_BOOL, boolVal: true }
 
+// NullValue returns the Value for Null/nil
 func NullValue() *Value {
   return &nullValue
 }
@@ -33,26 +37,35 @@ func (v *Value) Type() int {
   return v.varType
 }
 
+// BoolValue returns a Value for a bool
 func BoolValue( i bool ) *Value {
-  return &Value{ varType: VAR_BOOL, boolVal: i }
+  if i {
+    return &trueValue
+  }
+  return &falseValue
 }
 
+// IntValue returns a Value for an int64
 func IntValue( i int64 ) *Value {
   return &Value{ varType: VAR_INT, intVal: i }
 }
 
+// FloatValue returns a Value for an float64
 func FloatValue( i float64 ) *Value {
   return &Value{ varType: VAR_FLOAT, floatVal: i }
 }
 
+// StringValue returns a Value for an string
 func StringValue( i string ) *Value {
   return &Value{ varType: VAR_STRING, stringVal: i }
 }
 
+// IsNull returns true if the Value is null
 func (v *Value) IsNull() bool {
   return v.varType == VAR_NULL
 }
 
+// IsZero returns true if the Value is null, false, 0, 0.0 or "" dependent on it's type
 func (v *Value) IsZero() bool {
   switch v.varType {
     case VAR_NULL:
@@ -68,6 +81,11 @@ func (v *Value) IsZero() bool {
     default:
       return false
   }
+}
+
+// IsNumeric returns true if the Value is a number, i.e. int64 or float64
+func (v *Value) IsNumeric() bool {
+  return v.varType == VAR_INT || v.varType == VAR_FLOAT
 }
 
 // Bool returns the value as a bool
