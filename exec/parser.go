@@ -78,6 +78,11 @@ func (p *Parser) Expect( s string ) error {
   return err
 }
 
+// An operation that takes no arguments
+func ActionOp( p *Parser, n *Node, h NodeHandler ) error {
+  return n.Append( p.New( h ) )
+}
+
 // Parse a unary operation, e.g. NOT v
 func UnaryOp( p *Parser, n *Node, h NodeHandler ) error {
   bn := p.New( h )

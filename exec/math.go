@@ -14,6 +14,22 @@ var mathFunctions = FuncMap{
   "atan":     FuncMapEntry{ atanHandler,    UnaryOp  },
   //"atan2":      FuncMapEntry{ atan2Handler,             BinaryOp  },
   "atanh":    FuncMapEntry{ atanhHandler,   UnaryOp  },
+  "cbrt":     FuncMapEntry{ cbrtHandler,    UnaryOp  },
+  "ceil":     FuncMapEntry{ ceilHandler,    UnaryOp  },
+  "cos":      FuncMapEntry{ cosHandler,     UnaryOp  },
+  "cosh":     FuncMapEntry{ coshHandler,   UnaryOp  },
+  // Constants
+  "e":        FuncMapEntry{ constE,         ActionOp  },
+  "pi":       FuncMapEntry{ constPI,        ActionOp  },
+  "phi":      FuncMapEntry{ constPHI,       ActionOp  },
+  "sqrt2":    FuncMapEntry{ constSQRT2,     ActionOp  },
+  "sqrte":    FuncMapEntry{ constSQRTE,     ActionOp  },
+  "sqrtpi":   FuncMapEntry{ constSQRTPI,    ActionOp  },
+  "sqrtphi":  FuncMapEntry{ constSQRTPHI,   ActionOp  },
+  "ln2":      FuncMapEntry{ constLN2,       ActionOp  },
+  "log2e":    FuncMapEntry{ constLOG2E,     ActionOp  },
+  "ln10":     FuncMapEntry{ constLN10,      ActionOp  },
+  "log10e":   FuncMapEntry{ constLOG10E,    ActionOp  },
 }
 
 // Handles math functions that take 1 parameter
@@ -86,4 +102,75 @@ func atan2Handler( m *Context, n *Node ) error {
 
 func atanhHandler( m *Context, n *Node ) error {
   return mathInvoke1( m, n, math.Atanh )
+}
+
+func cbrtHandler( m *Context, n *Node ) error {
+  return mathInvoke1( m, n, math.Cbrt )
+}
+
+func ceilHandler( m *Context, n *Node ) error {
+  return mathInvoke1( m, n, math.Ceil )
+}
+
+func cosHandler( m *Context, n *Node ) error {
+  return mathInvoke1( m, n, math.Cos )
+}
+
+func coshHandler( m *Context, n *Node ) error {
+  return mathInvoke1( m, n, math.Cosh )
+}
+
+func constE( m *Context, n *Node ) error {
+  m.PushFloat( math.E )
+  return nil
+}
+
+func constPI( m *Context, n *Node ) error {
+  m.PushFloat( math.Pi )
+  return nil
+}
+
+func constPHI( m *Context, n *Node ) error {
+  m.PushFloat( math.Phi )
+  return nil
+}
+
+func constSQRT2( m *Context, n *Node ) error {
+  m.PushFloat( math.Sqrt2 )
+  return nil
+}
+
+func constSQRTE( m *Context, n *Node ) error {
+  m.PushFloat( math.SqrtE )
+  return nil
+}
+
+func constSQRTPI( m *Context, n *Node ) error {
+  m.PushFloat( math.SqrtPi )
+  return nil
+}
+
+func constSQRTPHI( m *Context, n *Node ) error {
+  m.PushFloat( math.SqrtPhi )
+  return nil
+}
+
+func constLN2( m *Context, n *Node ) error {
+  m.PushFloat( math.Ln2 )
+  return nil
+}
+
+func constLOG2E( m *Context, n *Node ) error {
+  m.PushFloat( math.Log2E )
+  return nil
+}
+
+func constLN10( m *Context, n *Node ) error {
+  m.PushFloat( math.Ln10 )
+  return nil
+}
+
+func constLOG10E( m *Context, n *Node ) error {
+  m.PushFloat( math.Log10E )
+  return nil
 }
