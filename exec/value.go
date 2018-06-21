@@ -6,6 +6,7 @@ import (
 
 // The types of a Value returned by Type()
 const (
+  // Ignore 0 so use _ then if someone manually creates Value its an unknown type
   _ = iota
   VAR_NULL
   VAR_BOOL
