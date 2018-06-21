@@ -11,6 +11,12 @@ RUN apk add --no-cache \
       curl \
       git
 
+# Our build scripts
+ADD scripts/ /usr/local/bin/
+
+# Ensure we have the libraries - docker will cache these between builds
+RUN get.sh
+
 # Ensure we have the libraries - docker will cache these between builds
 #RUN go get -v \
 #      github.com/peter-mount/golib/... \
@@ -24,25 +30,8 @@ WORKDIR /go/src/github.com/peter-mount/calculator
 ADD . .
 
 # ============================================================
-FROM source AS compiler
-ARG goos
-ARG goarch
-ARG goarm
-
-RUN for package in \
-      exec \
-      ;do \
-        CGO_ENABLED=0 \
-        GOOS=${goos} \
-        GOARCH=${goarch} \
-        GOARM=${goarm} \
-        go build \
-          -o /dest/statusmonitor \
-          github.com/peter-mount/calculator/${package} ;\
-      done
-
-# ============================================================
-# Finally build the final runtime container will all required files
-#FROM area51/scratch-base
-#COPY --from=compiler /dest/ /
-#ENTRYPOINT [ "/statusmonitor" ]
+# Run all tests in a new container so any output won't affect
+# the final build.
+FROM source as test
+ARG skipTest
+RUN if [ -z "$skipTest" ] ;then test.sh; fi

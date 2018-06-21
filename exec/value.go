@@ -172,7 +172,7 @@ func (v *Value) String() string {
     case VAR_INT:
       return strconv.FormatInt( v.intVal, 10 )
     case VAR_FLOAT:
-      return strconv.FormatFloat( v.floatVal, 'f', 10, 16 )
+      return strconv.FormatFloat( v.floatVal, 'f', 10, 64 )
     case VAR_STRING:
       return v.stringVal
     default:
