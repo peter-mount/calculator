@@ -39,10 +39,14 @@ func (p *Parser) Parse( rule string ) error {
   p.scanner.Filename = "filter"
 
   // Parse the root but always return the root here
+  n := p.root
   for p.tokenType != scanner.EOF {
-    err := p.ParseToken( p.root )
-    if err != nil {
-      return err
+    next, err := p.ParseToken( n )
+    if p.tokenType != scanner.EOF {
+      if err != nil {
+        return err
+      }
+      n = next
     }
   }
 
@@ -105,54 +109,31 @@ func (p *Parser) Expect( s string ) error {
 }
 
 // An operation that takes no arguments
-func ActionOp( p *Parser, n *Node, h NodeHandler ) error {
-  return n.Append( p.New( h ) )
+func ActionOp( p *Parser, n *Node, h NodeHandler ) (*Node,error) {
+  bn := p.New( h )
+  return bn, n.Append( bn )
 }
 
 // Parse a unary operation, e.g. NOT v
-func UnaryOp( p *Parser, n *Node, h NodeHandler ) error {
+func UnaryOp( p *Parser, n *Node, h NodeHandler ) (*Node,error) {
   bn := p.New( h )
+
   err := n.Append( bn )
   if err != nil {
-    return err
+    return nil, err
   }
-  return p.ParseToken( bn )
+
+  a, err := p.ParseToken( bn )
+  return a, err
 }
 
 // Parse a binary operation, e.g. n AND nextNode
-func BinaryOp( p *Parser, n *Node, h NodeHandler ) error {
+func BinaryOp( p *Parser, n *Node, h NodeHandler ) (*Node,error) {
   bn := p.New( h )
   n.Replace( bn )
-  return p.ParseToken( bn )
-}
 
-// Parse a binary operation with separator, e.g. BETWEEN a AND b
-// For an operator requiring 2 params use "" for s. e.g. ATAN2 a b
-func BinaryOpSep( p *Parser, n *Node, h NodeHandler, s string ) error {
-  bn := p.New( h )
-
-  // this is just appended to
-  err := n.Append( bn )
-  if err != nil {
-    return err
-  }
-
-  // lhs
-  err = p.ParseToken( bn )
-  if err != nil {
-    return err
-  }
-
-  // Required separator, "" for not required
-  if s != "" {
-    err = p.Expect( s )
-    if err != nil {
-      return err
-    }
-  }
-
-  // rhs
-  return p.ParseToken( bn )
+  a, err := p.ParseToken( bn )
+  return a, err
 }
 
 // Create a new node for a handler
@@ -165,41 +146,45 @@ func (p *Parser) NewConstant( v *Value ) *Node {
 }
 
 // This is the main parser function - in a separate file for maintainability
-func (p *Parser) ParseToken( n *Node ) error {
+func (p *Parser) ParseToken( n *Node ) (*Node,error) {
 
   err := p.Scan()
   if err != nil {
-    return err
+    return nil, err
   }
 
   switch p.tokenType {
     case scanner.Ident:
       fme, ok := p.funcs[ p.Token() ]
       if ok {
-        err = fme.ParserDefinition( p, n, fme.NodeHandler )
-      } else {
-        err = p.UnknownToken()
+        bn, err := fme.ParserDefinition( p, n, fme.NodeHandler )
+        return bn, err
       }
     case scanner.Int:
       iv, err := strconv.ParseInt( p.Token(), 10, 64 )
       if err != nil {
-        return err
+        return nil, err
       }
-      err = n.Append( p.NewConstant( IntValue( iv ) ) )
+      bn := p.NewConstant( IntValue( iv ) )
+      return bn, n.Append( bn )
 
     case scanner.Float:
       fv, err := strconv.ParseFloat( p.Token(), 64 )
       if err != nil {
-        return err
+        return nil, err
       }
-      err = n.Append( p.NewConstant( FloatValue( fv ) ) )
+      bn := p.NewConstant( FloatValue( fv ) )
+      err = n.Append( bn )
+      return bn, err
 
     case scanner.String:
-      err = n.Append( p.NewConstant( StringValue( p.Token() ) ) )
+      bn := p.NewConstant( StringValue( p.Token() ) )
+      err = n.Append( bn )
+      return bn, err
 
     default:
-      err = p.UnknownToken()
+      return nil, p.UnknownToken()
   }
 
-  return err
+  return nil, p.UnknownToken()
 }

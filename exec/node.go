@@ -6,7 +6,7 @@ import (
 
 type NodeHandler func( *Context, *Node ) error
 
-type ParserDefinition func( *Parser, *Node, NodeHandler ) error
+type ParserDefinition func( *Parser, *Node, NodeHandler ) (*Node,error)
 
 type FuncMapEntry struct {
   NodeHandler
@@ -51,20 +51,16 @@ func (n *Node) Replace( next *Node ) error {
     return errors.New( "No lhs for " + next.token )
   }
 
-  // add next to the parent instead of this node
   p := n.parent
   if p.lhs == n {
     p.lhs = next
   } else {
-    p.rhs = n
+    p.rhs = next
   }
 
-  // Add ourselves as the new lhs
-  next.lhs = n
-
-  // Fix the parentage
   next.parent = p
-  n.parent = next
+
+  next.Append( n )
 
   return nil
 }
