@@ -27,7 +27,7 @@ type Node struct {
   // handler for this node
   handler     NodeHandler
   // The value of this node
-  value       Value
+  value      *Value
   test  bool
 }
 

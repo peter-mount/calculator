@@ -1,7 +1,12 @@
 package exec
 
 var logicFunctions = FuncMap{
-  "=":        FuncMapEntry{ equalHandler,             BinaryOp },
+  "true":     FuncMapEntry{ trueHandler,              ActionOp  },
+  "false":    FuncMapEntry{ falseHandler,             ActionOp  },
+  "null":     FuncMapEntry{ nullHandler,              ActionOp  },
+  "nil":      FuncMapEntry{ nullHandler,              ActionOp  },
+  //
+  "==":        FuncMapEntry{ equalHandler,             BinaryOp },
   "!=":       FuncMapEntry{ notEqualHandler,          BinaryOp },
   "<":        FuncMapEntry{ lessThanHandler,          BinaryOp },
   "<=":       FuncMapEntry{ lessThanEqualHandler,     BinaryOp },
@@ -13,6 +18,21 @@ var logicFunctions = FuncMap{
   "or":       FuncMapEntry{ orHandler,                BinaryOp },
   "||":       FuncMapEntry{ orHandler,                BinaryOp },
   "not":      FuncMapEntry{ notHandler,               UnaryOp  },
+}
+
+func trueHandler( m *Context, n *Node ) error {
+  m.Push( &trueValue )
+  return nil
+}
+
+func falseHandler( m *Context, n *Node ) error {
+  m.Push( &falseValue )
+  return nil
+}
+
+func nullHandler( m *Context, n *Node ) error {
+  m.Push( &nullValue )
+  return nil
 }
 
 func equalHandler( m *Context, n *Node ) error {

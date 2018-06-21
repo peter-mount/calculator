@@ -2,6 +2,7 @@ package exec
 
 import (
   "fmt"
+  "strconv"
   "strings"
   "text/scanner"
 )
@@ -11,25 +12,38 @@ type Parser struct {
   scanner       scanner.Scanner
   root         *Node
   funcs         FuncMap
+  tokenType     rune
+  token         string
 }
 
 func (c *Calculator) Parser() *Parser {
   p := &Parser{ calculator: c }
   p.funcs = make( FuncMap )
+  p.AddFuncs( &logicFunctions )
+  p.AddFuncs( &arithmeticFunctions )
+  p.AddFuncs( &mathFunctions )
   return p
 }
 
+func (p *Parser) GetRoot() *Node {
+  return p.root
+}
+
 func (p *Parser) Parse( rule string ) error {
+  fmt.Printf( "parse:\"%s\"\n", rule )
   // Root node is special
   p.root = &Node{ token: "ROOT", handler: rootHandler }
 
   p.scanner.Init( strings.NewReader( rule ) )
+  //p.scanner.Mode = scanner.ScanIdents | scanner.ScanFloats | scanner.ScanStrings | scanner.ScanRawStrings | scanner.ScanComments | scanner.SkipComments
   p.scanner.Filename = "filter"
 
   // Parse the root but always return the root here
-  err := p.ParseToken( p.root )
-  if err != nil {
-    return err
+  for p.tokenType != scanner.EOF {
+    err := p.ParseToken( p.root )
+    if err != nil {
+      return err
+    }
   }
 
   p.calculator.root = p.root
@@ -52,19 +66,31 @@ func rootHandler( m *Context, n *Node ) error {
 }
 
 func (p *Parser) UnknownToken() error {
-  return fmt.Errorf( "Unknown token: \"%s\"", p.scanner.TokenText() )
+  return fmt.Errorf( "Unknown token: \"%s\"", p.token )
 }
 
 func (p *Parser) Token() string {
-  return p.scanner.TokenText()
+  return p.token
 }
 
 func (p *Parser) Scan() error {
-  if p.scanner.Scan() == scanner.EOF {
+  p.tokenType = p.scanner.Scan()
+  if p.tokenType == scanner.EOF {
     return fmt.Errorf( "EOF" )
   }
 
-  fmt.Printf( "%s: %s\n", p.scanner.Position, p.scanner.TokenText() )
+  p.token = p.scanner.TokenText()
+
+  // Treat chars as an ident
+  if p.tokenType > 32 && p.tokenType < 127 {
+    p.tokenType = scanner.Ident
+    for p.scanner.Peek() > 32 && p.scanner.Peek() < 127 {
+      p.scanner.Scan()
+      p.token = p.token + p.scanner.TokenText()
+    }
+  }
+
+  fmt.Printf( "%2d:%s: %s\n", p.tokenType, p.scanner.Position, p.token )
 
   return nil
 }
@@ -134,6 +160,10 @@ func (p *Parser) New( f NodeHandler ) *Node {
   return &Node{ token: p.Token(), handler: f }
 }
 
+func (p *Parser) NewConstant( v *Value ) *Node {
+  return &Node{ token: p.Token(), value: v }
+}
+
 // This is the main parser function - in a separate file for maintainability
 func (p *Parser) ParseToken( n *Node ) error {
 
@@ -142,22 +172,33 @@ func (p *Parser) ParseToken( n *Node ) error {
     return err
   }
 
-  if fme, ok := p.funcs[ p.Token() ]; ok {
-    err = fme.ParserDefinition( p, n, fme.NodeHandler )
-  } else {
-    // Check for constant & if not then fail
-    /*
-    v, err := p.tokenInt()
-    if err == nil {
-      err = n.append( p.newConstant( v ) )
+  switch p.tokenType {
+    case scanner.Ident:
+      fme, ok := p.funcs[ p.Token() ]
+      if ok {
+        err = fme.ParserDefinition( p, n, fme.NodeHandler )
+      } else {
+        err = p.UnknownToken()
+      }
+    case scanner.Int:
+      iv, err := strconv.ParseInt( p.Token(), 10, 64 )
       if err != nil {
         return err
       }
-    } else {
-      return p.UnknownToken()
-    }
-    */
-    return p.UnknownToken()
+      err = n.Append( p.NewConstant( IntValue( iv ) ) )
+
+    case scanner.Float:
+      fv, err := strconv.ParseFloat( p.Token(), 64 )
+      if err != nil {
+        return err
+      }
+      err = n.Append( p.NewConstant( FloatValue( fv ) ) )
+
+    case scanner.String:
+      err = n.Append( p.NewConstant( StringValue( p.Token() ) ) )
+
+    default:
+      err = p.UnknownToken()
   }
 
   return err

@@ -21,8 +21,8 @@ func (r *Node) logTree( m map[*Node]interface{}, depth int ) {
   m[r] = nil
   defer delete( m, r )
 
-  if r.handler== nil {
-    log.Printf( s + " (%d)", r.token, r.value )
+  if r.value != nil {
+    log.Printf( s + " %d \"%s\"", r.token, r.value.varType, r.value.String() )
   } else {
     log.Printf( s, r.token )
   }
