@@ -5,6 +5,7 @@ import (
   "math"
 )
 
+/*
 var mathFunctions = FuncMap{
   "abs":      FuncMapEntry{ absHandler,     UnaryOp  },
   "acos":     FuncMapEntry{ acosHandler,    UnaryOp  },
@@ -31,6 +32,7 @@ var mathFunctions = FuncMap{
   "ln10":     FuncMapEntry{ constLN10,      ActionOp  },
   "log10e":   FuncMapEntry{ constLOG10E,    ActionOp  },
 }
+*/
 
 // Handles math functions that take 1 parameter
 func mathInvoke1( m *Context, n *Node, f func(float64) float64 ) error {

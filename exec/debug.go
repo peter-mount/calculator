@@ -7,23 +7,33 @@ import (
 
 // HtmlTree will write a simple html document to a writer showing the layout
 // of a Node tree. This is useful in debugging the parser.
-func (r *Node) HtmlTree( w io.Writer ) {
+func HtmlTree( r *Node, w io.Writer, title string ) {
   m := make( map[*Node]interface{} )
-
-  io.WriteString( w, "<html><head><style>body > table table {border:1px solid grey;} td {vertical-align:top;}</style><body>" )
-
-  c := &nodeCell{}
-  r.logTree( m, c )
+  c := &nodeCell{t:title}
+  if r != nil {
+    logTree( m, c, r )
+  }
   c.print( w )
-
+}
+func HtmlTreeStart( w io.Writer ) {
+  //body > table
+  io.WriteString( w, "<html><head><style>" )
+  io.WriteString( w, " table {border:1px solid grey;}" )
+  io.WriteString( w, " body > table {display:inline-table; margin: 0.25em;}" )
+  io.WriteString( w, " body > table table {width:100%;}" )
+  io.WriteString( w, " td {vertical-align:top;width:50%;}" )
+  io.WriteString( w, " th {width:50%;}" )
+  io.WriteString( w, "</style><body>" )
+}
+func HtmlTreeEnd( w io.Writer ) {
   io.WriteString( w, "</body></html>" )
 }
 
-func (r *Node) logTree( m map[*Node]interface{}, p *nodeCell ) {
+func logTree( m map[*Node]interface{}, p *nodeCell, r *Node ) {
   // Prevent infinite loops - should not happen except if a bug happens in the tree
   if _, visited := m[r]; visited {
     // We've already visited this which is an error
-    c := p.append( "Looping:&nbsp;" + r.token )
+    p.append( "Looping:&nbsp;" + r.token )
     return
   }
   m[r] = nil
@@ -31,11 +41,11 @@ func (r *Node) logTree( m map[*Node]interface{}, p *nodeCell ) {
 
   c := p.append( r.token )
 
-  if r.lhs != nil {
-    r.lhs.logTree( m, c )
+  if r.left != nil {
+    logTree( m, c, r.left )
   }
-  if r.rhs != nil {
-    r.rhs.logTree( m, c )
+  if r.right != nil {
+    logTree( m, c, r.right )
   }
 }
 

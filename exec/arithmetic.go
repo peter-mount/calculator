@@ -4,14 +4,6 @@ import (
   "errors"
 )
 
-var arithmeticFunctions = FuncMap{
-  "+":        FuncMapEntry{ addHandler,             BinaryOp },
-  "-":        FuncMapEntry{ subHandler,             BinaryOp },
-  "*":        FuncMapEntry{ multHandler,            BinaryOp },
-  "/":        FuncMapEntry{ divHandler,             BinaryOp },
-  "int":      FuncMapEntry{ notHandler,             UnaryOp  },
-}
-
 func addHandler( m *Context, n *Node ) error {
   err := n.Invoke2(m)
   if err != nil {

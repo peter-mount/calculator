@@ -21,22 +21,23 @@ type Node struct {
   // parent node
   parent     *Node
   // left hand side
-  lhs        *Node
+  left       *Node
   // right hand side
-  rhs        *Node
+  right      *Node
   // handler for this node
   handler     NodeHandler
   // The value of this node
   value      *Value
-  test  bool
+  // precedence
+  precedence  int
 }
 
-// set lhs or rhs if lhs is occupied
+// set left or right if left is occupied
 func (n *Node) Append( next *Node ) error {
-  if n.lhs == nil {
-    n.lhs = next
-  } else if n.rhs == nil {
-    n.rhs = next
+  if n.left == nil {
+    n.left = next
+  } else if n.right == nil {
+    n.right = next
   } else {
     return errors.New( "Node full" )
   }
@@ -44,18 +45,32 @@ func (n *Node) Append( next *Node ) error {
   return nil
 }
 
+func NewNode( t string, f NodeHandler ) *Node {
+  return &Node{ token: t, handler: f }
+}
+
+func (n *Node) AppendHandler( p *Parser, h NodeHandler ) (*Node,error) {
+  n1 := NewNode( p.token, h )
+  return n1, n.Append( n1 )
+}
+
+func (n *Node) AppendValue( p *Parser, v *Value ) (*Node,error) {
+  n1 := &Node{ token: v.String(), value: v, precedence: p.precedence }
+  return n1, n.Append( n1 )
+}
+
 // Replace this node in the tree with a new node and make this one the new node's
-// lhs. Used when parsing a AND b where this is a.
+// left. Used when parsing a AND b where this is a.
 func (n *Node) Replace( next *Node ) error {
   if n.parent == nil {
-    return errors.New( "No lhs for " + next.token )
+    return errors.New( "No left for " + next.token )
   }
 
   p := n.parent
-  if p.lhs == n {
-    p.lhs = next
+  if p.left == n {
+    p.left = next
   } else {
-    p.rhs = next
+    p.right = next
   }
 
   next.parent = p
@@ -75,21 +90,21 @@ func (n *Node) Invoke( m *Context ) error {
 
 // Invokes the left hand side node or returns false if none
 func (n *Node) InvokeLhs( m *Context ) error {
-  if n.lhs != nil {
-    return n.lhs.Invoke(m)
+  if n.left != nil {
+    return n.left.Invoke(m)
   }
   return nil
 }
 
 // Invokes the right hand side node or returns false if none
 func (n *Node) InvokeRhs( m *Context ) error {
-  if n.rhs != nil {
-    return n.rhs.Invoke(m)
+  if n.right != nil {
+    return n.right.Invoke(m)
   }
   return nil
 }
 
-// Invoke2 is for use by handlers. It will invoke both lhs & rhs in one go
+// Invoke2 is for use by handlers. It will invoke both left & right in one go
 func (n *Node) Invoke2( m *Context ) error {
   err := n.InvokeLhs(m)
   if err != nil {
