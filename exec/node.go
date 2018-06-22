@@ -84,6 +84,8 @@ func (n *Node) Replace( next *Node ) error {
 func (n *Node) Invoke( m *Context ) error {
   if n.handler != nil {
     return n.handler( m, n )
+  } else if n.value != nil {
+    m.Push( n.value )
   }
   return nil
 }
