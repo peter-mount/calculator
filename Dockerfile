@@ -35,3 +35,6 @@ ADD . .
 FROM source as test
 ARG skipTest
 RUN if [ -z "$skipTest" ] ;then test.sh; fi
+
+#FROM source as compile
+RUN compile.sh
