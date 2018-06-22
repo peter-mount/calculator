@@ -1,5 +1,34 @@
 package exec
 
+func (p *Parser) parse_logic() (*Node,error) {
+
+  expr, err := p.parse_additive()
+  if err != nil {
+    return nil, err
+  }
+
+  token := p.lexer.Peek()
+  for token.text == "==" || token.text == "!=" {
+    token = p.lexer.Next()
+
+    right, err := p.parse_additive()
+    if err != nil {
+      return nil, err
+    }
+
+    switch token.text {
+      case "==":
+        expr = &Node{ token:token.text, left:expr, right: right, handler: equalHandler }
+      case "!=":
+        expr = &Node{ token:token.text, left:expr, right: right, handler: notEqualHandler }
+    }
+
+    token = p.lexer.Peek()
+  }
+
+  return expr, err
+}
+
 func trueHandler( m *Context, n *Node ) error {
   m.Push( &trueValue )
   return nil
@@ -55,13 +84,13 @@ func notEqualHandler( m *Context, n *Node ) error {
 
   switch a.Type() {
     case VAR_BOOL:
-      m.PushBool( a.Bool() == b.Bool() )
+      m.PushBool( a.Bool() != b.Bool() )
     case VAR_INT:
-      m.PushBool( a.Int() == b.Int() )
+      m.PushBool( a.Int() != b.Int() )
     case VAR_FLOAT:
-      m.PushBool( a.Float() == b.Float() )
+      m.PushBool( a.Float() != b.Float() )
     case VAR_STRING:
-      m.PushBool( a.String() == b.String() )
+      m.PushBool( a.String() != b.String() )
     default:
       m.PushBool( false )
   }
