@@ -17,23 +17,53 @@ type Token struct {
   text    string
 }
 
+// Returns true if a rune should be matched as an ident
+func IsIdent( r rune ) bool {
+  return r=='=' ||
+    r=='^' || r=='&' ||
+    r=='%' || r=='!' ||
+    r==':' || r==';'
+}
+
+func IsPlusMinus( r rune ) bool {
+  return r=='+' || r=='-'
+}
+
+func IsDigit( r rune ) bool {
+  return r>='0' && r<='9'
+}
+
+func (l *Lexer) scan() *Token {
+  return &Token{ token: l.scanner.Scan() }
+}
+
+func (l *Lexer) scanNext() string {
+  l.scanner.Scan()
+  return l.scanner.TokenText()
+}
+
+func (l *Lexer) scanWhile(f func(rune)bool) string {
+  var s string
+  for IsIdent( l.scanner.Peek() ) {
+    s = s + l.scanNext()
+  }
+  return s
+}
+
 func (l *Lexer) Parse( rule string ) {
   l.scanner.Init( strings.NewReader( rule ) )
 
   var token *Token
   for token == nil || token.token != scanner.EOF {
-    token = &Token{ token: l.scanner.Scan() }
+    token = l.scan()
 
     if token.token != scanner.EOF {
       token.text = l.scanner.TokenText()
 
       // Treat chars as an ident
-      if token.token > 32 && token.token < 127 {
+      if IsIdent( token.token ) {
         token.token = scanner.Ident
-        for l.scanner.Peek() > 32 && l.scanner.Peek() < 127 {
-          l.scanner.Scan()
-          token.text = token.text + l.scanner.TokenText()
-        }
+        token.text = token.text + l.scanWhile( IsIdent )
       }
 
     } else {

@@ -7,6 +7,23 @@ import (
 
 // HtmlTree will write a simple html document to a writer showing the layout
 // of a Node tree. This is useful in debugging the parser.
+//
+// For example:
+//
+// f, err := os.OpenFile( "/tmp/out.html", os.O_CREATE | os.O_TRUNC|os.O_WRONLY, 0666 )
+// if err != nil { return nil }
+// defer f.Close()
+// e := "1 + 2 * 3 + 49"
+// HtmlTreeStart( f )
+// parser := calc.Parser()
+// err = parser.Parse( e )
+// if err != nil {
+//   t.Error( err )
+// } else {
+//   HtmlTree( parser.GetRoot(), f, e )
+// }
+// HtmlTreeEnd( f )
+//
 func HtmlTree( r *Node, w io.Writer, title string ) {
   m := make( map[*Node]interface{} )
   c := &nodeCell{t:title}

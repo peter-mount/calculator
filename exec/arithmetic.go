@@ -35,7 +35,7 @@ func (p *Parser) parse_additive() (*Node,error) {
 
 func (p *Parser) parse_multiplicative() (*Node,error) {
 
-  expr, err := p.parse_unary()
+  expr, err := p.parse_parens()
   if err != nil {
     return nil, err
   }
@@ -44,7 +44,7 @@ func (p *Parser) parse_multiplicative() (*Node,error) {
   for token.text == "*" || token.text == "/" {
     token = p.lexer.Next()
 
-    right, err := p.parse_unary()
+    right, err := p.parse_parens()
     if err != nil {
       return nil, err
     }

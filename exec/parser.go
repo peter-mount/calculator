@@ -29,6 +29,15 @@ func (p *Parser) GetRoot() *Node {
 
 func (p *Parser) Parse( rule string ) error {
   p.lexer.Parse( rule )
+
+  if p.Debug {
+    fmt.Printf( " orig:%s\ntoken:", rule )
+    for _, t := range p.lexer.tokens {
+      fmt.Printf( "%s ", t.text )
+    }
+    fmt.Println()
+  }
+
   root, err := p.parse()
   p.root = root
   return err
@@ -49,6 +58,28 @@ func (p *Parser) parse() (*Node,error) {
   return n1, err
 }
 
+func (p *Parser) parse_parens() (*Node,error) {
+
+  token := p.lexer.Peek()
+  if token.text == "(" {
+    p.lexer.Next()
+
+    expr, err := p.parse()
+    if err != nil {
+      return nil, err
+    }
+
+    token = p.lexer.Next()
+    if token.text != ")" {
+      return nil, fmt.Errorf( "Expecting )" )
+    }
+    return expr, nil
+  }
+
+  expr, err := p.parse_unary()
+  return expr, err
+}
+
 func (p *Parser) parse_unary() (*Node,error) {
   var expr *Node
   var err error
@@ -56,14 +87,17 @@ func (p *Parser) parse_unary() (*Node,error) {
   token := p.lexer.Peek()
 
   switch token.token {
-    /*
     case scanner.Ident:
-      fme, ok := p.funcs[ p.Token() ]
+      token = p.lexer.Next()
+      /*
+
+      fme, ok := p.funcs[ token ]
       if ok {
         n1, err := fme.ParserDefinition( p, n, fme.NodeHandler )
         return n1, err
       }
       */
+      err = fmt.Errorf( "XXX Unknown token: \"%s\"", token.text )
     case scanner.Int:
       token = p.lexer.Next()
       iv, err := strconv.ParseInt( token.text, 10, 64 )
