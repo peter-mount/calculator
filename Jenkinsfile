@@ -15,6 +15,6 @@ node( 'Build' ) {
   }
 
   stage( 'Test' ) {
-    sh 'docker build -t calculator:test --target test .'
+    sh 'docker build -t calculator:build --target test .'
   }
 }
