@@ -55,17 +55,10 @@ func equalHandler( m *Context, n *Node ) error {
     return err
   }
 
-  switch a.Type() {
-    case VAR_BOOL:
-      m.PushBool( a.Bool() == b.Bool() )
-    case VAR_INT:
-      m.PushBool( a.Int() == b.Int() )
-    case VAR_FLOAT:
-      m.PushBool( a.Float() == b.Float() )
-    case VAR_STRING:
-      m.PushBool( a.String() == b.String() )
-    default:
-      m.PushBool( false )
+  if a==nil {
+    m.PushBool( b == nil )
+  } else {
+    m.PushBool( a.Equal( b ) )
   }
 
   return nil
@@ -82,17 +75,10 @@ func notEqualHandler( m *Context, n *Node ) error {
     return err
   }
 
-  switch a.Type() {
-    case VAR_BOOL:
-      m.PushBool( a.Bool() != b.Bool() )
-    case VAR_INT:
-      m.PushBool( a.Int() != b.Int() )
-    case VAR_FLOAT:
-      m.PushBool( a.Float() != b.Float() )
-    case VAR_STRING:
-      m.PushBool( a.String() != b.String() )
-    default:
-      m.PushBool( false )
+  if a==nil {
+    m.PushBool( b != nil )
+  } else {
+    m.PushBool( !a.Equal( b ) )
   }
 
   return nil

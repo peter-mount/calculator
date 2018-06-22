@@ -28,6 +28,37 @@ var nullValue Value = Value{ varType: VAR_NULL }
 var falseValue Value = Value{ varType: VAR_BOOL, boolVal: false }
 var trueValue Value = Value{ varType: VAR_BOOL, boolVal: true }
 
+func (a *Value) Same( b *Value ) bool {
+  if b == nil {
+    return false
+  }
+
+  if a == b {
+    return true
+  }
+
+  return a.varType == b.varType &&
+         a.boolVal == b.boolVal &&
+         a.intVal == b.intVal &&
+         a.floatVal == b.floatVal &&
+         a.stringVal == b.stringVal
+}
+
+func (a *Value) Equal( b *Value ) bool {
+  switch a.Type() {
+    case VAR_BOOL:
+      return a.Bool() == b.Bool()
+    case VAR_INT:
+      return a.Int() == b.Int()
+    case VAR_FLOAT:
+      return a.Float() == b.Float()
+    case VAR_STRING:
+      return a.String() == b.String()
+    default:
+      return false
+  }
+}
+
 // NullValue returns the Value for Null/nil
 func NullValue() *Value {
   return &nullValue
