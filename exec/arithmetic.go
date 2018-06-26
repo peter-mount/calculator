@@ -68,6 +68,9 @@ func (p *Parser) parse_negative() (*Node,error) {
 
   if token.text == "-" {
     token = p.lexer.Next()
+
+    // Future: If we want "--" operator put test here
+
     expr, err := p.parse_arithmetic()
     if err != nil {
       return nil, err
@@ -90,6 +93,12 @@ func (p *Parser) parse_negative() (*Node,error) {
     }
 
     return &Node{ token:token.text, left:expr, handler: negHandler }, nil
+  }
+
+  // Special case a + here means positive so skip the token as it's a nop
+  if token.text == "+" {
+    token = p.lexer.Next()
+    // Future: If we want "++" operator put test here
   }
 
   expr, err := p.parse_parens()
