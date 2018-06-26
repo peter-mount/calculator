@@ -123,7 +123,7 @@ func (p *Parser) parse_unary() (*Node,error) {
 
     case scanner.String:
       token = p.lexer.Next()
-      expr = &Node{ token:token.text, value: StringValue( token.text )  }
+      expr = &Node{ token:token.text, value: StringValue( token.text[1:len(token.text)-1] )  }
 
     default:
       err = fmt.Errorf( "Unknown token: \"%s\"", token.text )
