@@ -127,7 +127,9 @@ func negHandler( m *Context, n *Node ) error {
 // we should use float.
 func (a *Value) OperationType( b *Value ) int {
   t  := a.Type();
-  if a.Type() == VAR_FLOAT || b.Type() == VAR_FLOAT {
+  if a.Type() == VAR_STRING || b.Type() == VAR_STRING {
+    t = VAR_STRING
+  } else if a.Type() == VAR_FLOAT || b.Type() == VAR_FLOAT {
     t = VAR_FLOAT
   } else if a.Type() == VAR_INT || b.Type() == VAR_INT {
     t = VAR_INT

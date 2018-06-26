@@ -14,6 +14,8 @@ func TestParser_math( t *testing.T ) {
     "pi",
     "2 * pi",
     "-phi",
+    "1+-0.5",
+    "1 + \"0.5\"",
   }
 
   f, err := os.OpenFile( "/tmp/math.html", os.O_CREATE | os.O_TRUNC|os.O_WRONLY, 0666 )
