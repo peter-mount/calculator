@@ -134,6 +134,14 @@ func (c *Context) StartScope() {
   c.vars = append( []map[string]*Value{make(map[string]*Value)}, c.vars... )
 }
 
+func (c *Context) ResetScope() {
+  if len(c.vars) == 0 {
+    c.StartScope()
+  } else {
+    c.vars = []map[string]*Value{c.vars[0]}
+  }
+}
+
 // Ends the current variable scope. Note this will not remove the first scope
 // if present
 func (c *Context) EndScope() {

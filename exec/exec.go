@@ -28,5 +28,8 @@ func (c *Calculator) Execute( ctx *Context ) error {
   if ctx == nil {
     return errors.New( "No Context" )
   }
+
+  ctx.ResetScope()
+
   return c.root.Invoke( ctx )
 }

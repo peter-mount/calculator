@@ -54,27 +54,8 @@ func (p *Parser) AddFuncs( m *FuncMap ) error {
 }
 
 func (p *Parser) parse() (*Node,error) {
-  var n0 *Node
-  token := p.lexer.Peek()
-  for token.token != scanner.EOF {
-    n1, err := p.parse_statement()
-    if err != nil {
-      return nil, err
-    }
-    if n0 == nil {
-      n0 = n1
-    } else {
-      n0 = &Node{
-        left: n0,
-        right: n1,
-        handler: func( m *Context, n *Node ) error {
-          n.Invoke2(m)
-          return nil
-        } }
-    }
-    token = p.lexer.Peek()
-  }
-  return n0, nil
+  n1, err := p.parse_statements()
+  return n1, err
 }
 
 // Top level for normal arithmetic

@@ -106,3 +106,9 @@ func (l *Lexer) Next() *Token {
 func (l *Lexer) Peek() *Token {
   return l.tokens[l.pos]
 }
+
+// Skip skips the current token, same as Next() then Peek()
+func (l *Lexer) Skip() *Token {
+  l.Next()
+  return l.Peek()
+}

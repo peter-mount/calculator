@@ -18,6 +18,8 @@ func TestParser_math( t *testing.T ) {
     "1 + \"0.5\"",
     "$a = 6*7",
     "$a = 6*7 $a/2",
+    "$a = 6*7;$a/2;$a*2",
+    "{$a = 6*7;$a/2;$a*2}",
   }
 
   f, err := os.OpenFile( "/tmp/math.html", os.O_CREATE | os.O_TRUNC|os.O_WRONLY, 0666 )

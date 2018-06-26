@@ -23,6 +23,8 @@ type Node struct {
   handler     NodeHandler
   // The value of this node
   value      *Value
+  // slice of nodes for when we have multiple args or statements
+  list     []*Node
 }
 
 func NewNode( t string, f NodeHandler ) *Node {

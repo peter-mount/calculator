@@ -64,6 +64,9 @@ func logTree( m map[*Node]interface{}, p *nodeCell, r *Node ) {
   if r.right != nil {
     logTree( m, c, r.right )
   }
+  for _, n := range r.list {
+    logTree( m, c, n )
+  }
 }
 
 type nodeCell struct {
