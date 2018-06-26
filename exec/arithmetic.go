@@ -121,6 +121,20 @@ func negHandler( m *Context, n *Node ) error {
   return nil
 }
 
+// OperationType returns the type of the suggested value when performing some
+// operation like addition or multiplication to keep the precision of the result.
+// For example, if a Value is an Integer but the passed value is Float then
+// we should use float.
+func (a *Value) OperationType( b *Value ) int {
+  t  := a.Type();
+  if a.Type() == VAR_FLOAT || b.Type() == VAR_FLOAT {
+    t = VAR_FLOAT
+  } else if a.Type() == VAR_INT || b.Type() == VAR_INT {
+    t = VAR_INT
+  }
+  return t
+}
+
 func addHandler( m *Context, n *Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -132,7 +146,7 @@ func addHandler( m *Context, n *Node ) error {
     return err
   }
 
-  switch a.Type() {
+  switch a.OperationType( b ) {
     case VAR_BOOL:
       m.PushInt( a.Int() + b.Int() )
     case VAR_INT:
@@ -159,7 +173,7 @@ func subHandler( m *Context, n *Node ) error {
     return err
   }
 
-  switch a.Type() {
+  switch a.OperationType( b ) {
     case VAR_BOOL:
       m.PushInt( a.Int() - b.Int() )
     case VAR_INT:
@@ -184,7 +198,7 @@ func multHandler( m *Context, n *Node ) error {
     return err
   }
 
-  switch a.Type() {
+  switch a.OperationType( b ) {
     case VAR_BOOL:
       m.PushInt( a.Int() * b.Int() )
     case VAR_INT:
@@ -213,7 +227,7 @@ func divHandler( m *Context, n *Node ) error {
     return errors.New( "Division by zero")
   }
 
-  switch a.Type() {
+  switch a.OperationType( b ) {
     case VAR_BOOL:
       m.PushInt( a.Int() / b.Int() )
     case VAR_INT:
@@ -221,7 +235,7 @@ func divHandler( m *Context, n *Node ) error {
     case VAR_FLOAT:
       m.PushFloat( a.Float() / b.Float() )
     default:
-      return errors.New( "Unsupported type for sub" )
+      return errors.New( "Unsupported type for div" )
   }
 
   return nil
