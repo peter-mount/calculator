@@ -30,6 +30,15 @@ func (c *Context) PushString( s string ) {
   c.Push( StringValue( s ) )
 }
 
+func (c *Context) Peek() (*Value, error) {
+  l := len(c.stack)
+  if l == 0 {
+    return nil, errors.New( "Stack underflow" )
+  }
+
+  return c.stack[l-1], nil
+}
+
 // Pop a value from the stack.
 // Returns error if the stack is empty
 func (c *Context) Pop() (*Value, error) {
