@@ -35,7 +35,7 @@ func (p *Parser) parse_additive() (*Node,error) {
 
 func (p *Parser) parse_multiplicative() (*Node,error) {
 
-  expr, err := p.parse_parens()
+  expr, err := p.parse_negative()
   if err != nil {
     return nil, err
   }
@@ -44,7 +44,7 @@ func (p *Parser) parse_multiplicative() (*Node,error) {
   for token.text == "*" || token.text == "/" {
     token = p.lexer.Next()
 
-    right, err := p.parse_parens()
+    right, err := p.parse_negative()
     if err != nil {
       return nil, err
     }
@@ -60,6 +60,65 @@ func (p *Parser) parse_multiplicative() (*Node,error) {
   }
 
   return expr, err
+}
+
+// Handles the special case of -value. If value is a *Value then we negate it here
+func (p *Parser) parse_negative() (*Node,error) {
+  token := p.lexer.Peek()
+
+  if token.text == "-" {
+    token = p.lexer.Next()
+    expr, err := p.parse_arithmetic()
+    if err != nil {
+      return nil, err
+    }
+
+    // If expr is a value then we can just negate it now
+    if expr.value != nil {
+      value := expr.value
+      switch value.Type() {
+        case VAR_BOOL:
+          value = BoolValue( !value.Bool() )
+        case VAR_INT:
+          value = IntValue( -value.Int() )
+        case VAR_FLOAT:
+          value = FloatValue( -value.Float() )
+        default:
+          return nil, errors.New( "Unsupported type for neg" )
+      }
+      return &Node{ token:value.String(), value: value }, nil
+    }
+
+    return &Node{ token:token.text, left:expr, handler: negHandler }, nil
+  }
+
+  expr, err := p.parse_parens()
+  return expr, err
+}
+
+func negHandler( m *Context, n *Node ) error {
+  err := n.InvokeLhs(m)
+  if err != nil {
+    return err
+  }
+
+  a, err := m.Pop()
+  if err != nil {
+    return err
+  }
+
+  switch a.Type() {
+    case VAR_BOOL:
+      m.PushBool( !a.Bool() )
+    case VAR_INT:
+      m.PushInt( -a.Int() )
+    case VAR_FLOAT:
+      m.PushFloat( -a.Float() )
+    default:
+      return errors.New( "Unsupported type for neg" )
+  }
+
+  return nil
 }
 
 func addHandler( m *Context, n *Node ) error {

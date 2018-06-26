@@ -23,7 +23,7 @@ var testParser_eq []string = []string{
 
 func TestParser_parse( t *testing.T ) {
 
-  f, err := os.OpenFile( "/tmp/out.html", os.O_CREATE | os.O_TRUNC|os.O_WRONLY, 0666 )
+  f, err := os.OpenFile( "/tmp/parser.html", os.O_CREATE | os.O_TRUNC|os.O_WRONLY, 0666 )
   if err != nil {
     t.Error( err )
   } else {

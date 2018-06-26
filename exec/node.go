@@ -13,7 +13,7 @@ type FuncMapEntry struct {
   ParserDefinition
 }
 
-type FuncMap map[string]FuncMapEntry
+type FuncMap map[string]NodeHandler
 
 // A node in the filter tree
 type Node struct {

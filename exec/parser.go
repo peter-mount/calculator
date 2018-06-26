@@ -54,6 +54,13 @@ func (p *Parser) AddFuncs( m *FuncMap ) error {
 }
 
 func (p *Parser) parse() (*Node,error) {
+  // TODO: add support for subroutines etc here
+  n1, err := p.parse_arithmetic()
+  return n1, err
+}
+
+// Top level for normal arithmetic
+func (p *Parser) parse_arithmetic() (*Node,error) {
   n1, err := p.parse_logic()
   return n1, err
 }
@@ -64,7 +71,7 @@ func (p *Parser) parse_parens() (*Node,error) {
   if token.text == "(" {
     p.lexer.Next()
 
-    expr, err := p.parse()
+    expr, err := p.parse_arithmetic()
     if err != nil {
       return nil, err
     }
@@ -76,7 +83,7 @@ func (p *Parser) parse_parens() (*Node,error) {
     return expr, nil
   }
 
-  expr, err := p.parse_unary()
+  expr, err := p.parse_math()
   return expr, err
 }
 

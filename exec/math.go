@@ -5,34 +5,61 @@ import (
   "math"
 )
 
-/*
-var mathFunctions = FuncMap{
-  "abs":      FuncMapEntry{ absHandler,     UnaryOp  },
-  "acos":     FuncMapEntry{ acosHandler,    UnaryOp  },
-  "acosh":    FuncMapEntry{ acoshHandler,   UnaryOp  },
-  "asin":     FuncMapEntry{ asinHandler,    UnaryOp  },
-  "asinh":    FuncMapEntry{ asinhHandler,   UnaryOp  },
-  "atan":     FuncMapEntry{ atanHandler,    UnaryOp  },
-  //"atan2":      FuncMapEntry{ atan2Handler,             BinaryOp  },
-  "atanh":    FuncMapEntry{ atanhHandler,   UnaryOp  },
-  "cbrt":     FuncMapEntry{ cbrtHandler,    UnaryOp  },
-  "ceil":     FuncMapEntry{ ceilHandler,    UnaryOp  },
-  "cos":      FuncMapEntry{ cosHandler,     UnaryOp  },
-  "cosh":     FuncMapEntry{ coshHandler,   UnaryOp  },
-  // Constants
-  "e":        FuncMapEntry{ constE,         ActionOp  },
-  "pi":       FuncMapEntry{ constPI,        ActionOp  },
-  "phi":      FuncMapEntry{ constPHI,       ActionOp  },
-  "sqrt2":    FuncMapEntry{ constSQRT2,     ActionOp  },
-  "sqrte":    FuncMapEntry{ constSQRTE,     ActionOp  },
-  "sqrtpi":   FuncMapEntry{ constSQRTPI,    ActionOp  },
-  "sqrtphi":  FuncMapEntry{ constSQRTPHI,   ActionOp  },
-  "ln2":      FuncMapEntry{ constLN2,       ActionOp  },
-  "log2e":    FuncMapEntry{ constLOG2E,     ActionOp  },
-  "ln10":     FuncMapEntry{ constLN10,      ActionOp  },
-  "log10e":   FuncMapEntry{ constLOG10E,    ActionOp  },
+// parse_math1_handler creates a node for the current token but expects ( ) &
+// some arithmetic providing 1 response
+func (p *Parser) parse_math1_handler( token *Token, handler NodeHandler ) (*Node,error) {
+  token = p.lexer.Next()
+
+  nextToken := p.lexer.Peek()
+  if nextToken.text != "(" {
+    return nil, errors.New( "Expected " + token.text + "(arg)" )
+  }
+
+  left, err := p.parse_parens()
+  if err != nil {
+    return nil, err
+  }
+
+  expr := &Node{ token:token.text, left:left, handler: handler }
+  return expr, nil
 }
-*/
+
+// parse_math parses the internal math functions
+func (p *Parser) parse_math() (*Node,error) {
+  var expr *Node
+  var err error
+
+  token := p.lexer.Peek()
+  switch token.text {
+    case "abs":
+      expr, err = p.parse_math1_handler( token, absHandler )
+    case "acos":
+      expr, err = p.parse_math1_handler( token, acosHandler )
+    case "acosh":
+        expr, err = p.parse_math1_handler( token, acoshHandler )
+    case "asin":
+        expr, err = p.parse_math1_handler( token, asinHandler )
+    case "asinh":
+        expr, err = p.parse_math1_handler( token, asinhHandler )
+    case "atan":
+        expr, err = p.parse_math1_handler( token, atanHandler )
+    //"atan2":      FuncMapEntry{ atan2Handler,             BinaryOp  },
+    case "atanh":
+        expr, err = p.parse_math1_handler( token, atanhHandler )
+    case "cbrt":
+        expr, err = p.parse_math1_handler( token, cbrtHandler )
+    case "ceil":
+        expr, err = p.parse_math1_handler( token, ceilHandler )
+    case "cos":
+        expr, err = p.parse_math1_handler( token, cosHandler )
+    case "cosh":
+        expr, err = p.parse_math1_handler( token, coshHandler )
+    default:
+      expr, err = p.parse_constants()
+  }
+
+  return expr, err
+}
 
 // Handles math functions that take 1 parameter
 func mathInvoke1( m *Context, n *Node, f func(float64) float64 ) error {
@@ -120,59 +147,4 @@ func cosHandler( m *Context, n *Node ) error {
 
 func coshHandler( m *Context, n *Node ) error {
   return mathInvoke1( m, n, math.Cosh )
-}
-
-func constE( m *Context, n *Node ) error {
-  m.PushFloat( math.E )
-  return nil
-}
-
-func constPI( m *Context, n *Node ) error {
-  m.PushFloat( math.Pi )
-  return nil
-}
-
-func constPHI( m *Context, n *Node ) error {
-  m.PushFloat( math.Phi )
-  return nil
-}
-
-func constSQRT2( m *Context, n *Node ) error {
-  m.PushFloat( math.Sqrt2 )
-  return nil
-}
-
-func constSQRTE( m *Context, n *Node ) error {
-  m.PushFloat( math.SqrtE )
-  return nil
-}
-
-func constSQRTPI( m *Context, n *Node ) error {
-  m.PushFloat( math.SqrtPi )
-  return nil
-}
-
-func constSQRTPHI( m *Context, n *Node ) error {
-  m.PushFloat( math.SqrtPhi )
-  return nil
-}
-
-func constLN2( m *Context, n *Node ) error {
-  m.PushFloat( math.Ln2 )
-  return nil
-}
-
-func constLOG2E( m *Context, n *Node ) error {
-  m.PushFloat( math.Log2E )
-  return nil
-}
-
-func constLN10( m *Context, n *Node ) error {
-  m.PushFloat( math.Ln10 )
-  return nil
-}
-
-func constLOG10E( m *Context, n *Node ) error {
-  m.PushFloat( math.Log10E )
-  return nil
 }
