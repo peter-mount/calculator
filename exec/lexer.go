@@ -17,12 +17,25 @@ type Token struct {
   text    string
 }
 
+const (
+  TOKEN_VARIABLE = -(iota+100)
+)
+
 // Returns true if a rune should be matched as an ident
 func IsIdent( r rune ) bool {
   return r=='=' ||
     r=='^' || r=='&' ||
     r=='%' || r=='!' ||
     r==':' || r==';'
+}
+
+// IsVariableStart true if the rune is valid for the first char of a variable name
+func IsVariableStart( r rune ) bool {
+  return (r>='a' && r<='z') || (r>='A' && r<='Z')
+}
+// IsVariableSuccessor true if the rune is valid for the successive chars in a variable name
+func IsVariableSuccessor( r rune ) bool {
+  return IsVariableStart(r) || r=='_' || (r>='0' && r<='9')
 }
 
 func IsPlusMinus( r rune ) bool {
@@ -44,7 +57,7 @@ func (l *Lexer) scanNext() string {
 
 func (l *Lexer) scanWhile(f func(rune)bool) string {
   var s string
-  for IsIdent( l.scanner.Peek() ) {
+  for f( l.scanner.Peek() ) {
     s = s + l.scanNext()
   }
   return s
@@ -64,6 +77,10 @@ func (l *Lexer) Parse( rule string ) {
       if IsIdent( token.token ) {
         token.token = scanner.Ident
         token.text = token.text + l.scanWhile( IsIdent )
+      } else if token.token == '$' {
+        // $AAA as a variable name so parse it without $ in the text
+        token.token = TOKEN_VARIABLE
+        token.text = l.scanWhile( IsVariableStart ) + l.scanWhile( IsVariableStart )
       }
 
     } else {

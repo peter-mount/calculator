@@ -16,6 +16,8 @@ func TestParser_math( t *testing.T ) {
     "-phi",
     "1+-0.5",
     "1 + \"0.5\"",
+    "$a = 6*7",
+    "$a = 6*7 $a/2",
   }
 
   f, err := os.OpenFile( "/tmp/math.html", os.O_CREATE | os.O_TRUNC|os.O_WRONLY, 0666 )
@@ -52,6 +54,7 @@ func TestParser_math( t *testing.T ) {
       t.Error( err )
     } else {
       ctx := &Context{}
+      //ctx.SetVarInt( "a", 42 )
 
       err = calc.Execute( ctx )
       if err != nil {
@@ -61,6 +64,7 @@ func TestParser_math( t *testing.T ) {
       f.WriteString( eq )
       f.WriteString( "</strong> = ")
       ctx.StackDump( f )
+      ctx.VarDump( f )
       f.WriteString( "</p> ")
     }
   }

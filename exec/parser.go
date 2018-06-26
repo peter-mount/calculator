@@ -54,9 +54,27 @@ func (p *Parser) AddFuncs( m *FuncMap ) error {
 }
 
 func (p *Parser) parse() (*Node,error) {
-  // TODO: add support for subroutines etc here
-  n1, err := p.parse_arithmetic()
-  return n1, err
+  var n0 *Node
+  token := p.lexer.Peek()
+  for token.token != scanner.EOF {
+    n1, err := p.parse_statement()
+    if err != nil {
+      return nil, err
+    }
+    if n0 == nil {
+      n0 = n1
+    } else {
+      n0 = &Node{
+        left: n0,
+        right: n1,
+        handler: func( m *Context, n *Node ) error {
+          n.Invoke2(m)
+          return nil
+        } }
+    }
+    token = p.lexer.Peek()
+  }
+  return n0, nil
 }
 
 // Top level for normal arithmetic
@@ -124,6 +142,10 @@ func (p *Parser) parse_unary() (*Node,error) {
     case scanner.String:
       token = p.lexer.Next()
       expr = &Node{ token:token.text, value: StringValue( token.text[1:len(token.text)-1] )  }
+
+    case TOKEN_VARIABLE:
+      token = p.lexer.Next()
+      expr = &Node{ tokenRune: TOKEN_VARIABLE, token: token.text, handler: getVarHandler }
 
     default:
       err = fmt.Errorf( "Unknown token: \"%s\"", token.text )

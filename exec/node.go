@@ -13,6 +13,7 @@ type FuncMap map[string]NodeHandler
 
 // A node in the filter tree
 type Node struct {
+  tokenRune   rune
   token       string
   // left hand side
   left       *Node

@@ -7,6 +7,7 @@ import (
 // The runtime context used when performing processing
 type Context struct {
   stack   []*Value
+  vars    []map[string]*Value
 }
 
 // Push a value onto the stack
@@ -83,4 +84,60 @@ func (c *Context) Swap() error {
   c.stack[l-2] = c.stack[l-1]
   c.stack[l-1] = a
   return nil
+}
+
+func (c *Context) GetVar( n string ) *Value {
+  for _, v := range c.vars {
+    if val, exists := v[n]; exists {
+      return val
+    }
+  }
+  return nil
+}
+
+func (c *Context) SetVar( n string, val *Value ) {
+  // Force a scope to start if we don't have none
+  if len(c.vars) == 0 {
+    c.StartScope()
+  }
+
+  // Find existing entry
+  for _, v := range c.vars {
+    if _, exists := v[n]; exists {
+      v[n] = val
+      return
+    }
+  }
+
+  // Set in current scope
+  c.vars[0][n] = val
+}
+
+func (c *Context) SetVarBool( n string, val bool ) {
+  c.SetVar( n, BoolValue( val ) )
+}
+
+func (c *Context) SetVarInt( n string, val int64 ) {
+  c.SetVar( n, IntValue( val ) )
+}
+
+func (c *Context) SetVarFloat( n string, val float64 ) {
+  c.SetVar( n, FloatValue( val ) )
+}
+
+func (c *Context) SetVarString( n string, val string ) {
+  c.SetVar( n, StringValue( val ) )
+}
+
+// Starts a variable scope
+func (c *Context) StartScope() {
+  c.vars = append( []map[string]*Value{make(map[string]*Value)}, c.vars... )
+}
+
+// Ends the current variable scope. Note this will not remove the first scope
+// if present
+func (c *Context) EndScope() {
+  if len(c.vars) > 1 {
+    c.vars = c.vars[1:]
+  }
 }

@@ -128,3 +128,28 @@ func (c *Context) StackDump( w io.Writer) {
   }
   io.WriteString( w, "]\n")
 }
+
+func (c *Context) VarDump( w io.Writer ) {
+  for i, m := range c.vars {
+    if i>0 {
+      io.WriteString( w, ", ")
+    }
+    io.WriteString( w, "{")
+    for k, v := range m {
+      io.WriteString( w, "\"")
+      io.WriteString( w, k )
+      io.WriteString( w, "\"=")
+
+      s := v.Type() == VAR_STRING
+      if s {
+        io.WriteString( w, "\"")
+      }
+      io.WriteString( w, v.String() )
+      if s {
+        io.WriteString( w, "\"")
+      }
+    }
+    io.WriteString( w, "}")
+  }
+  io.WriteString( w, "\n")
+}
