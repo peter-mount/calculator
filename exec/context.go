@@ -2,7 +2,6 @@ package exec
 
 import (
   "errors"
-  "io"
 )
 
 // The runtime context used when performing processing
@@ -75,15 +74,4 @@ func (c *Context) Swap() error {
   c.stack[l-2] = c.stack[l-1]
   c.stack[l-1] = a
   return nil
-}
-
-func (c *Context) StackDump( w io.Writer) {
-  io.WriteString( w, "[")
-  for i, v := range c.stack {
-    if i>0 {
-      io.WriteString( w, ", ")
-    }
-    io.WriteString( w, v.String() )
-  }
-  io.WriteString( w, "]\n")
 }

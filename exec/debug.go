@@ -109,3 +109,22 @@ func logMax( a, b int ) int {
   }
   return b
 }
+
+// StackDump writes the current state of the stack to a Writer
+func (c *Context) StackDump( w io.Writer) {
+  io.WriteString( w, "[")
+  for i, v := range c.stack {
+    if i>0 {
+      io.WriteString( w, ", ")
+    }
+    s := v.Type() == VAR_STRING
+    if s {
+      io.WriteString( w, "\"")
+    }
+    io.WriteString( w, v.String() )
+    if s {
+      io.WriteString( w, "\"")
+    }
+  }
+  io.WriteString( w, "]\n")
+}
