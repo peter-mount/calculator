@@ -17,6 +17,7 @@ var constants = map[string]*Value{
   "log2e": FloatValue( math.Log2E ),
   "ln10": FloatValue( math.Ln10 ),
   "log10e": FloatValue( math.Log10E ),
+  "nan": FloatValue( math.NaN() ),
 }
 
 // parse_constants Handles mathematical constants
