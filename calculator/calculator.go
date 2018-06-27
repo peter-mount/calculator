@@ -3,8 +3,8 @@ package calculator
 import (
   "errors"
   "github.com/peter-mount/calculator/context"
-  "github.com/peter-mount/calculator/exec"
   "github.com/peter-mount/calculator/lex"
+  "github.com/peter-mount/calculator/parser"
 )
 
 type Calculator struct {
@@ -16,9 +16,9 @@ func (c *Calculator) Parse( s string ) error {
   lexer := &lex.Lexer{}
   lexer.Parse( s )
 
-  parser := exec.NewParser( lexer )
+  parse := parser.NewParser( lexer )
 
-  root, err := parser.ParseStatement()
+  root, err := parse.ParseStatements()
   if err != nil {
     return err
   }

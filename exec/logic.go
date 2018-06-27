@@ -4,51 +4,22 @@ import (
   "github.com/peter-mount/calculator/context"
 )
 
-func (p *Parser) parse_logic() (*context.Node,error) {
-
-  expr, err := p.parse_additive()
-  if err != nil {
-    return nil, err
-  }
-
-  token := p.lexer.Peek()
-  for token.Text() == "==" || token.Text() == "!=" {
-    token = p.lexer.Next()
-
-    right, err := p.parse_additive()
-    if err != nil {
-      return nil, err
-    }
-
-    switch token.Text() {
-      case "==":
-        expr = context.NewNode( token, equalHandler, expr, right )
-      case "!=":
-        expr = context.NewNode( token, notEqualHandler, expr, right )
-    }
-
-    token = p.lexer.Peek()
-  }
-
-  return expr, err
-}
-
-func trueHandler( m *context.Context, n *context.Node ) error {
+func TrueHandler( m *context.Context, n *context.Node ) error {
   m.PushBool( true )
   return nil
 }
 
-func falseHandler( m *context.Context, n *context.Node ) error {
+func FalseHandler( m *context.Context, n *context.Node ) error {
   m.PushBool( false )
   return nil
 }
 
-func nullHandler( m *context.Context, n *context.Node ) error {
+func NullHandler( m *context.Context, n *context.Node ) error {
   m.PushNull()
   return nil
 }
 
-func equalHandler( m *context.Context, n *context.Node ) error {
+func EqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -68,7 +39,7 @@ func equalHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func notEqualHandler( m *context.Context, n *context.Node ) error {
+func NotEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -88,7 +59,7 @@ func notEqualHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func lessThanHandler( m *context.Context, n *context.Node ) error {
+func LessThanHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -113,7 +84,7 @@ func lessThanHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func lessThanEqualHandler( m *context.Context, n *context.Node ) error {
+func LessThanEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -138,7 +109,7 @@ func lessThanEqualHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func greaterThanEqualHandler( m *context.Context, n *context.Node ) error {
+func GreaterThanEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -163,7 +134,7 @@ func greaterThanEqualHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func greaterThanHandler( m *context.Context, n *context.Node ) error {
+func GreaterThanHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -188,7 +159,7 @@ func greaterThanHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func betweenHandler( m *context.Context, n *context.Node ) error {
+func BetweenHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -219,7 +190,7 @@ func betweenHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func andHandler( m *context.Context, n *context.Node ) error {
+func AndHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -234,7 +205,7 @@ func andHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func orHandler( m *context.Context, n *context.Node ) error {
+func OrHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -249,7 +220,7 @@ func orHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
-func notHandler( m *context.Context, n *context.Node ) error {
+func NotHandler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
     return err

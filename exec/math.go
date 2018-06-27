@@ -3,131 +3,8 @@ package exec
 import (
   "errors"
   "github.com/peter-mount/calculator/context"
-  "github.com/peter-mount/calculator/lex"
   "math"
 )
-
-// parse_math1_handler creates a node for the current token but expects ( ) &
-// some arithmetic providing 1 response
-func (p *Parser) parse_math1_handler( token *lex.Token, handler context.NodeHandler ) (*context.Node,error) {
-  token = p.lexer.Next()
-
-  nextToken := p.lexer.Peek()
-  if nextToken.Text() != "(" {
-    return nil, errors.New( "Expected " + token.Text() + "(arg)" )
-  }
-
-  left, err := p.parse_parens()
-  if err != nil {
-    return nil, err
-  }
-
-  expr := context.NewNode( token, handler, left, nil )
-  return expr, nil
-}
-
-// parse_math parses built in single argument function
-func (p *Parser) parse_math() (*context.Node,error) {
-  var expr *context.Node
-  var err error
-
-  token := p.lexer.Peek()
-  switch token.Text() {
-    case "abs":
-      expr, err = p.parse_math1_handler( token, absHandler )
-    case "acos":
-      expr, err = p.parse_math1_handler( token, acosHandler )
-    case "acosh":
-      expr, err = p.parse_math1_handler( token, acoshHandler )
-    case "asin":
-      expr, err = p.parse_math1_handler( token, asinHandler )
-    case "asinh":
-      expr, err = p.parse_math1_handler( token, asinhHandler )
-    case "atan":
-      expr, err = p.parse_math1_handler( token, atanHandler )
-    case "atanh":
-      expr, err = p.parse_math1_handler( token, atanhHandler )
-    case "cbrt":
-      expr, err = p.parse_math1_handler( token, cbrtHandler )
-    case "ceil":
-      expr, err = p.parse_math1_handler( token, ceilHandler )
-    case "cos":
-      expr, err = p.parse_math1_handler( token, cosHandler )
-    case "cosh":
-      expr, err = p.parse_math1_handler( token, coshHandler )
-
-    case "erf":
-      expr, err = p.parse_math1_handler( token, erfHandler )
-    case "erfc":
-      expr, err = p.parse_math1_handler( token, erfcHandler )
-    case "erfinv":
-      expr, err = p.parse_math1_handler( token, erfinvHandler )
-    case "exp":
-      expr, err = p.parse_math1_handler( token, expHandler )
-    case "exp2":
-      expr, err = p.parse_math1_handler( token, exp2Handler )
-    case "expm1":
-      expr, err = p.parse_math1_handler( token, expm1Handler )
-    case "floor":
-      expr, err = p.parse_math1_handler( token, floorHandler )
-
-    case "ilogb":
-      expr, err = p.parse_math1_handler( token, ilogbHandler )
-    case "isnan":
-      expr, err = p.parse_math1_handler( token, isNaNHandler )
-
-    case "j0":
-      expr, err = p.parse_math1_handler( token, j0Handler )
-    case "j1":
-      expr, err = p.parse_math1_handler( token, j1Handler )
-
-    case "log":
-      expr, err = p.parse_math1_handler( token, logHandler )
-    case "log10":
-      expr, err = p.parse_math1_handler( token, log10Handler )
-    case "log1p":
-      expr, err = p.parse_math1_handler( token, log1pHandler )
-    case "log2":
-      expr, err = p.parse_math1_handler( token, log2Handler )
-    case "logb":
-      expr, err = p.parse_math1_handler( token, logbHandler )
-
-    case "pow10":
-      expr, err = p.parse_math1_handler( token, pow10Handler )
-
-    case "round":
-      expr, err = p.parse_math1_handler( token, roundHandler )
-
-    case "roundtoeven":
-      expr, err = p.parse_math1_handler( token, round2evenHandler )
-
-    case "sin":
-      expr, err = p.parse_math1_handler( token, sinHandler )
-    case "sincos":
-      expr, err = p.parse_math1_handler( token, sincosHandler )
-    case "sinh":
-      expr, err = p.parse_math1_handler( token, sinhHandler )
-    case "sqrt":
-      expr, err = p.parse_math1_handler( token, sqrtHandler )
-
-    case "tan":
-      expr, err = p.parse_math1_handler( token, tanHandler )
-    case "tanh":
-      expr, err = p.parse_math1_handler( token, tanhHandler )
-    case "trunc":
-      expr, err = p.parse_math1_handler( token, truncHandler )
-
-    case "y0":
-      expr, err = p.parse_math1_handler( token, y0Handler )
-    case "y1":
-      expr, err = p.parse_math1_handler( token, y1Handler )
-
-    default:
-      expr, err = p.parse_constants()
-  }
-
-  return expr, err
-}
 
 // Handles math functions that take 1 parameter
 func mathInvoke1( m *context.Context, n *context.Node, f func(float64) float64 ) error {
@@ -168,83 +45,83 @@ func mathInvoke2( m *context.Context, n *context.Node, f func(float64,float64) f
   }
 }
 
-func absHandler( m *context.Context, n *context.Node ) error {
+func AbsHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Abs )
 }
 
-func acosHandler( m *context.Context, n *context.Node ) error {
+func AcosHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Acos )
 }
 
-func acoshHandler( m *context.Context, n *context.Node ) error {
+func AcoshHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Acosh )
 }
 
-func asinHandler( m *context.Context, n *context.Node ) error {
+func AsinHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Asin )
 }
 
-func asinhHandler( m *context.Context, n *context.Node ) error {
+func AsinhHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Asinh )
 }
 
-func atanHandler( m *context.Context, n *context.Node ) error {
+func AtanHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Atan )
 }
 
-func atan2Handler( m *context.Context, n *context.Node ) error {
+func Atan2Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke2( m, n, math.Atan2 )
 }
 
-func atanhHandler( m *context.Context, n *context.Node ) error {
+func AtanhHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Atanh )
 }
 
-func cbrtHandler( m *context.Context, n *context.Node ) error {
+func CbrtHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Cbrt )
 }
 
-func ceilHandler( m *context.Context, n *context.Node ) error {
+func CeilHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Ceil )
 }
 
-func cosHandler( m *context.Context, n *context.Node ) error {
+func CosHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Cos )
 }
 
-func coshHandler( m *context.Context, n *context.Node ) error {
+func CoshHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Cosh )
 }
 
-func erfHandler( m *context.Context, n *context.Node ) error {
+func ErfHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Erf )
 }
 
-func erfcHandler( m *context.Context, n *context.Node ) error {
+func ErfcHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Erfc )
 }
 
-func erfinvHandler( m *context.Context, n *context.Node ) error {
+func ErfinvHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Erfinv )
 }
 
-func expHandler( m *context.Context, n *context.Node ) error {
+func ExpHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Exp )
 }
 
-func exp2Handler( m *context.Context, n *context.Node ) error {
+func Exp2Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Exp2 )
 }
 
-func expm1Handler( m *context.Context, n *context.Node ) error {
+func Expm1Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Expm1 )
 }
 
-func floorHandler( m *context.Context, n *context.Node ) error {
+func FloorHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Floor )
 }
 
-func ilogbHandler( m *context.Context, n *context.Node ) error {
+func IlogbHandler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
     return err
@@ -263,7 +140,7 @@ func ilogbHandler( m *context.Context, n *context.Node ) error {
   return errors.New( "Unsupported type" )
 }
 
-func isNaNHandler( m *context.Context, n *context.Node ) error {
+func IsNaNHandler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
     return err
@@ -282,35 +159,35 @@ func isNaNHandler( m *context.Context, n *context.Node ) error {
   return errors.New( "Unsupported type" )
 }
 
-func j0Handler( m *context.Context, n *context.Node ) error {
+func J0Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.J0 )
 }
 
-func j1Handler( m *context.Context, n *context.Node ) error {
+func J1Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.J1 )
 }
 
-func logHandler( m *context.Context, n *context.Node ) error {
+func LogHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Log )
 }
 
-func log10Handler( m *context.Context, n *context.Node ) error {
+func Log10Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Log10 )
 }
 
-func log1pHandler( m *context.Context, n *context.Node ) error {
+func Log1pHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Log1p )
 }
 
-func log2Handler( m *context.Context, n *context.Node ) error {
+func Log2Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Log2 )
 }
 
-func logbHandler( m *context.Context, n *context.Node ) error {
+func LogbHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Logb )
 }
 
-func pow10Handler( m *context.Context, n *context.Node ) error {
+func Pow10Handler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
     return err
@@ -329,19 +206,19 @@ func pow10Handler( m *context.Context, n *context.Node ) error {
   return errors.New( "Unsupported type" )
 }
 
-func roundHandler( m *context.Context, n *context.Node ) error {
+func RoundHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Round )
 }
 
-func round2evenHandler( m *context.Context, n *context.Node ) error {
+func Round2evenHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.RoundToEven )
 }
 
-func sinHandler( m *context.Context, n *context.Node ) error {
+func SinHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Sin )
 }
 
-func sincosHandler( m *context.Context, n *context.Node ) error {
+func SincosHandler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
     return err
@@ -362,30 +239,30 @@ func sincosHandler( m *context.Context, n *context.Node ) error {
   return errors.New( "Unsupported type" )
 }
 
-func sinhHandler( m *context.Context, n *context.Node ) error {
+func SinhHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Sinh )
 }
 
-func sqrtHandler( m *context.Context, n *context.Node ) error {
+func SqrtHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Sqrt )
 }
 
-func tanHandler( m *context.Context, n *context.Node ) error {
+func TanHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Tan )
 }
 
-func tanhHandler( m *context.Context, n *context.Node ) error {
+func TanhHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Tanh )
 }
 
-func truncHandler( m *context.Context, n *context.Node ) error {
+func TruncHandler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Trunc )
 }
 
-func y0Handler( m *context.Context, n *context.Node ) error {
+func Y0Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Y0 )
 }
 
-func y1Handler( m *context.Context, n *context.Node ) error {
+func Y1Handler( m *context.Context, n *context.Node ) error {
   return mathInvoke1( m, n, math.Y1 )
 }

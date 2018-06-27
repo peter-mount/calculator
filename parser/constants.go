@@ -1,4 +1,4 @@
-package exec
+package parser
 
 import (
   "github.com/peter-mount/calculator/context"

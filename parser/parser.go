@@ -1,8 +1,9 @@
-package exec
+package parser
 
 import (
   "fmt"
   "github.com/peter-mount/calculator/context"
+  "github.com/peter-mount/calculator/exec"
   "github.com/peter-mount/calculator/lex"
   "strconv"
   "text/scanner"
@@ -22,7 +23,7 @@ func NewParser( l *lex.Lexer ) *Parser {
   return p
 }
 
-func (p *Parser) ParseStatement() (*context.Node,error) {
+func (p *Parser) ParseStatements() (*context.Node,error) {
   n1, err := p.parse_statements()
   return n1, err
 }
@@ -95,7 +96,7 @@ func (p *Parser) parse_unary() (*context.Node,error) {
 
     case lex.TOKEN_VARIABLE:
       token = p.lexer.Next()
-      expr = context.NewNode( token, getVarHandler, nil, nil )
+      expr = context.NewNode( token, exec.GetVarHandler, nil, nil )
 
     default:
       err = fmt.Errorf( "Unknown token: \"%s\"", token.Text() )
