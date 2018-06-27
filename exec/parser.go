@@ -9,45 +9,20 @@ import (
 )
 
 type Parser struct {
-  calculator   *Calculator
-  lexer         lex.Lexer
-  root         *context.Node
+  lexer        *lex.Lexer
   //funcs         FuncMap
   tokenType     rune
   token         string
   precedence    int
 }
 
-func (c *Calculator) Parser() *Parser {
-  p := &Parser{ calculator: c }
+func NewParser( l *lex.Lexer ) *Parser {
+  p := &Parser{ lexer: l }
   //p.funcs = make( FuncMap )
   return p
 }
 
-func (p *Parser) GetRoot() *context.Node {
-  return p.root
-}
-
-func (p *Parser) Parse( rule string ) error {
-  p.lexer.Parse( rule )
-  root, err := p.parse()
-  p.root = root
-  return err
-}
-
-/*
-func (p *Parser) AddFuncs( m *FuncMap ) error {
-  for k, f := range *m {
-    if _, exists := p.funcs[k]; exists {
-      return fmt.Errorf( "Token \"%s\" already has a mapping", k )
-    }
-    p.funcs[k] = f
-  }
-  return nil
-}
-*/
-
-func (p *Parser) parse() (*context.Node,error) {
+func (p *Parser) ParseStatement() (*context.Node,error) {
   n1, err := p.parse_statements()
   return n1, err
 }

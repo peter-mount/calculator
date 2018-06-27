@@ -3,8 +3,8 @@ package main
 import (
   "flag"
   "fmt"
+  "github.com/peter-mount/calculator/calculator"
   "github.com/peter-mount/calculator/context"
-  "github.com/peter-mount/calculator/exec"
   "os"
 )
 
@@ -12,7 +12,7 @@ func main() {
 
   flag.Parse()
 
-  calc := &exec.Calculator{}
+  calc := &calculator.Calculator{}
 
   for _, arg := range flag.Args() {
     errorExit( calc.Parse( arg ) )
@@ -22,7 +22,7 @@ func main() {
 
     result, err := ctx.Pop()
     errorExit(err)
-    
+
     fmt.Printf("%v\n",result)
   }
 

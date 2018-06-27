@@ -1,8 +1,10 @@
-package exec
+package calculator
 
 import (
   "errors"
   "github.com/peter-mount/calculator/context"
+  "github.com/peter-mount/calculator/exec"
+  "github.com/peter-mount/calculator/lex"
 )
 
 type Calculator struct {
@@ -10,15 +12,22 @@ type Calculator struct {
 }
 
 func (c *Calculator) Parse( s string ) error {
-  parser := c.Parser()
-  err := parser.Parse( s )
+
+  lexer := &lex.Lexer{}
+  lexer.Parse( s )
+
+  parser := exec.NewParser( lexer )
+
+  root, err := parser.ParseStatement()
   if err != nil {
     return err
   }
-  c.root = parser.GetRoot()
+  c.root = root
+
   if c.root == nil {
     return errors.New( "Nothing generated from parser" )
   }
+
   return nil
 }
 
@@ -33,4 +42,8 @@ func (c *Calculator) Execute( ctx *context.Context ) error {
   ctx.ResetScope()
 
   return c.root.Invoke( ctx )
+}
+
+func (c *Calculator) GetRoot() *context.Node {
+  return c.root
 }

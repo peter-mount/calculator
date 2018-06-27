@@ -1,15 +1,15 @@
 package test
 
 import (
+  "github.com/peter-mount/calculator/calculator"
   "github.com/peter-mount/calculator/context"
-  "github.com/peter-mount/calculator/exec"
   "testing"
 )
 
 // Test basic math precedence
 func TestExec( t *testing.T ) {
 
-  calc := &exec.Calculator{}
+  calc := &calculator.Calculator{}
 
   err := calc.Parse( "1 + 1" )
   if err != nil {

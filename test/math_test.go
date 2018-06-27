@@ -1,9 +1,9 @@
 package test
 
 import (
+  "github.com/peter-mount/calculator/calculator"
   "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/debug"
-  "github.com/peter-mount/calculator/exec"
   "io"
   "os"
   "testing"
@@ -34,20 +34,16 @@ func TestParser_math( t *testing.T ) {
 
   debug.HtmlTreeStart( f )
 
-  calc := &exec.Calculator{}
+  calc := &calculator.Calculator{}
 
   for _, e := range testdata {
-    parser := calc.Parser()
-    // Uncomment to see debugging
-    //parser.Debug = true
-
-    err = parser.Parse( e )
+    err = calc.Parse( e )
     if err != nil {
       t.Error( err )
-    } else if parser.GetRoot() == nil {
+    } else if calc.GetRoot() == nil {
       io.WriteString( f, "*** nil root ***" )
     } else {
-      debug.HtmlTree( parser.GetRoot(), f, e )
+      debug.HtmlTree( calc.GetRoot(), f, e )
     }
   }
 
