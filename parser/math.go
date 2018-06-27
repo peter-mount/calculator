@@ -60,6 +60,8 @@ func (p *Parser) parse_math() (*context.Node,error) {
       expr, err = p.parse_math1_handler( token, exec.ErfHandler )
     case "erfc":
       expr, err = p.parse_math1_handler( token, exec.ErfcHandler )
+    case "erfcinv":
+      expr, err = p.parse_math1_handler( token, exec.ErfcinvHandler )
     case "erfinv":
       expr, err = p.parse_math1_handler( token, exec.ErfinvHandler )
     case "exp":
@@ -70,6 +72,9 @@ func (p *Parser) parse_math() (*context.Node,error) {
       expr, err = p.parse_math1_handler( token, exec.Expm1Handler )
     case "floor":
       expr, err = p.parse_math1_handler( token, exec.FloorHandler )
+
+    case "gamma":
+      expr, err = p.parse_math1_handler( token, exec.GammaHandler )
 
     case "ilogb":
       expr, err = p.parse_math1_handler( token, exec.IlogbHandler )
@@ -103,8 +108,6 @@ func (p *Parser) parse_math() (*context.Node,error) {
 
     case "sin":
       expr, err = p.parse_math1_handler( token, exec.SinHandler )
-    case "sincos":
-      expr, err = p.parse_math1_handler( token, exec.SincosHandler )
     case "sinh":
       expr, err = p.parse_math1_handler( token, exec.SinhHandler )
     case "sqrt":

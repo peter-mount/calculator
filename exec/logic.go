@@ -4,21 +4,25 @@ import (
   "github.com/peter-mount/calculator/context"
 )
 
+// Boolean true
 func TrueHandler( m *context.Context, n *context.Node ) error {
   m.PushBool( true )
   return nil
 }
 
+// Boolean false
 func FalseHandler( m *context.Context, n *context.Node ) error {
   m.PushBool( false )
   return nil
 }
 
+// Null/Nil value
 func NullHandler( m *context.Context, n *context.Node ) error {
   m.PushNull()
   return nil
 }
 
+// Compare two values for equality
 func EqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -39,6 +43,7 @@ func EqualHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// Compare two values for inequality
 func NotEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -59,6 +64,7 @@ func NotEqualHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// a < b
 func LessThanHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -84,6 +90,7 @@ func LessThanHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// a <= b
 func LessThanEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -109,6 +116,7 @@ func LessThanEqualHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// a >= b
 func GreaterThanEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -134,6 +142,7 @@ func GreaterThanEqualHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// a > b
 func GreaterThanHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -159,6 +168,7 @@ func GreaterThanHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// a between b and c
 func BetweenHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -190,6 +200,7 @@ func BetweenHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// a and b
 func AndHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -205,6 +216,7 @@ func AndHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// a or b
 func OrHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
@@ -220,6 +232,7 @@ func OrHandler( m *context.Context, n *context.Node ) error {
   return nil
 }
 
+// !a
 func NotHandler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
