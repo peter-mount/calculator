@@ -39,7 +39,7 @@ func NewNode( t *lex.Token, f NodeHandler, left *Node, right *Node ) *Node {
 }
 
 func NewConstant( t *lex.Token, val *Value ) *Node {
-  return &Node{ token: t, value: val }
+  return &Node{ token: t.Clone( val.String() ), value: val }
 }
 
 func NewBlock( f NodeHandler ) *Node {
@@ -96,6 +96,11 @@ func (n *Node) Token() *lex.Token {
 // Value returns this nodes value or nil
 func (n *Node) Value() *Value {
   return n.value
+}
+
+// IsConstant returns true if this node is a constant, i.e. has a Value and no Handler
+func (n *Node) IsConstant() bool {
+  return n.handler == nil && n.value != nil
 }
 
 // Left returns the left hand node or nil

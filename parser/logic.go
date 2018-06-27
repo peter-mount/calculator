@@ -23,9 +23,15 @@ func (p *Parser) parse_logic() (*context.Node,error) {
 
     switch token.Text() {
       case "==":
-        expr = context.NewNode( token, exec.EqualHandler, expr, right )
+        expr, err = OptimizeOperation( token, expr, right, exec.EqualHandler, exec.Equal )
+        if err != nil {
+          return nil, err
+        }
       case "!=":
-        expr = context.NewNode( token, exec.NotEqualHandler, expr, right )
+        expr, err = OptimizeOperation( token, expr, right, exec.NotEqualHandler, exec.NotEqual )
+        if err != nil {
+          return nil, err
+        }
     }
 
     token = p.lexer.Peek()

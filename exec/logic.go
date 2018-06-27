@@ -34,13 +34,19 @@ func EqualHandler( m *context.Context, n *context.Node ) error {
     return err
   }
 
+  c, err := Equal( a, b )
+  if err == nil {
+    m.Push( c )
+  }
+  return err
+}
+
+func Equal( a *context.Value, b *context.Value ) (*context.Value,error) {
   if a==nil {
-    m.PushBool( b == nil )
-  } else {
-    m.PushBool( a.Equal( b ) )
+    return context.BoolValue( b == nil ), nil
   }
 
-  return nil
+  return context.BoolValue( a.Equal( b ) ), nil
 }
 
 // Compare two values for inequality
@@ -55,13 +61,19 @@ func NotEqualHandler( m *context.Context, n *context.Node ) error {
     return err
   }
 
+  c, err := NotEqual( a, b )
+  if err == nil {
+    m.Push( c )
+  }
+  return err
+}
+
+func NotEqual( a *context.Value, b *context.Value ) (*context.Value,error) {
   if a==nil {
-    m.PushBool( b != nil )
-  } else {
-    m.PushBool( !a.Equal( b ) )
+    return context.BoolValue( b != nil ), nil
   }
 
-  return nil
+  return context.BoolValue( !a.Equal( b ) ), nil
 }
 
 // a < b

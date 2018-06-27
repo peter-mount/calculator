@@ -23,6 +23,15 @@ const (
   TOKEN_VARIABLE = -(iota+100)
 )
 
+// Clone returns a new token with its text set to the new string.
+// If the string is the same as the current text then the current token is returned.
+func (t *Token) Clone( s string ) *Token {
+  if s == t.text {
+    return t
+  }
+  return &Token{ token: t.token, text: s }
+}
+
 // Returns true if a rune should be matched as an ident
 func IsIdent( r rune ) bool {
   return r=='=' ||

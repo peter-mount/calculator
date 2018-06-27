@@ -47,20 +47,29 @@ func AddHandler( m *context.Context, n *context.Node ) error {
     return err
   }
 
-  switch a.OperationType( b ) {
-    case context.VAR_BOOL:
-      m.PushInt( a.Int() + b.Int() )
-    case context.VAR_INT:
-      m.PushInt( a.Int() + b.Int() )
-    case context.VAR_FLOAT:
-      m.PushFloat( a.Float() + b.Float() )
-    case context.VAR_STRING:
-      m.PushString( a.String() + b.String() )
-    default:
-      return errors.New( "Unsupported type for add" )
+  c, err := Add( a, b )
+  if err == nil {
+    m.Push( c )
+  }
+  return err
+}
+
+// Add two Values
+func Add( a *context.Value, b *context.Value ) (*context.Value,error) {
+  if a != nil && b != nil {
+    switch a.OperationType( b ) {
+      case context.VAR_BOOL:
+        return context.IntValue( a.Int() + b.Int() ), nil
+      case context.VAR_INT:
+        return context.IntValue( a.Int() + b.Int() ), nil
+      case context.VAR_FLOAT:
+        return context.FloatValue( a.Float() + b.Float() ), nil
+      case context.VAR_STRING:
+        return context.StringValue( a.String() + b.String() ), nil
+    }
   }
 
-  return nil
+  return nil, errors.New( "Unsupported type for add" )
 }
 
 // Subtraction of two values
@@ -78,18 +87,28 @@ func SubHandler( m *context.Context, n *context.Node ) error {
     return err
   }
 
-  switch a.OperationType( b ) {
-    case context.VAR_BOOL:
-      m.PushInt( a.Int() - b.Int() )
-    case context.VAR_INT:
-      m.PushInt( a.Int() - b.Int() )
-    case context.VAR_FLOAT:
-      m.PushFloat( a.Float() - b.Float() )
-    default:
-      return errors.New( "Unsupported type for sub" )
+  c, err := Sub( a, b )
+  if err == nil {
+    m.Push( c )
+  }
+  return err
+}
+
+// Subtract two Values
+func Sub( a *context.Value, b *context.Value ) (*context.Value,error) {
+  if a != nil && b != nil {
+    switch a.OperationType( b ) {
+      case context.VAR_BOOL:
+        return context.IntValue( a.Int() - b.Int() ), nil
+      case context.VAR_INT:
+        return context.IntValue( a.Int() - b.Int() ), nil
+      case context.VAR_FLOAT:
+        return context.FloatValue( a.Float() - b.Float() ), nil
+      default:
+    }
   }
 
-  return nil
+  return nil, errors.New( "Unsupported type for sub" )
 }
 
 // Multiplication of two values.
@@ -107,18 +126,26 @@ func MultHandler( m *context.Context, n *context.Node ) error {
     return err
   }
 
-  switch a.OperationType( b ) {
-    case context.VAR_BOOL:
-      m.PushInt( a.Int() * b.Int() )
-    case context.VAR_INT:
-      m.PushInt( a.Int() * b.Int() )
-    case context.VAR_FLOAT:
-      m.PushFloat( a.Float() * b.Float() )
-    default:
-      return errors.New( "Unsupported type for mult" )
+  c, err := Mult( a, b )
+  if err == nil {
+    m.Push( c )
   }
+  return err
+}
 
-  return nil
+// Multiply two Values
+func Mult( a *context.Value, b *context.Value ) (*context.Value,error) {
+  if a != nil && b != nil {
+    switch a.OperationType( b ) {
+      case context.VAR_BOOL:
+        return context.IntValue( a.Int() * b.Int() ), nil
+      case context.VAR_INT:
+        return context.IntValue( a.Int() * b.Int() ), nil
+      case context.VAR_FLOAT:
+        return context.FloatValue( a.Float() * b.Float() ), nil
+      }
+  }
+  return nil, errors.New( "Unsupported type for mult" )
 }
 
 // Division of two values.
@@ -137,20 +164,29 @@ func DivHandler( m *context.Context, n *context.Node ) error {
     return err
   }
 
-  if b.IsZero() {
-    return errors.New( "Division by zero")
+  c, err := Div( a, b )
+  if err == nil {
+    m.Push( c )
+  }
+  return err
+}
+
+// Divide two Values
+func Div( a *context.Value, b *context.Value ) (*context.Value,error) {
+  if a != nil && b != nil {
+    if b.IsZero() {
+      return nil, errors.New( "Division by zero")
+    }
+
+    switch a.OperationType( b ) {
+      case context.VAR_BOOL:
+        return context.IntValue( a.Int() / b.Int() ), nil
+      case context.VAR_INT:
+        return context.FloatValue( a.Float() / b.Float() ), nil
+      case context.VAR_FLOAT:
+        return context.FloatValue( a.Float() / b.Float() ), nil
+    }
   }
 
-  switch a.OperationType( b ) {
-    case context.VAR_BOOL:
-      m.PushInt( a.Int() / b.Int() )
-    case context.VAR_INT:
-      m.PushInt( a.Int() / b.Int() )
-    case context.VAR_FLOAT:
-      m.PushFloat( a.Float() / b.Float() )
-    default:
-      return errors.New( "Unsupported type for div" )
-  }
-
-  return nil
+  return nil, errors.New( "Unsupported type for div" )
 }

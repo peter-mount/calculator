@@ -4,7 +4,24 @@ import (
   "errors"
   "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/exec"
+  "github.com/peter-mount/calculator/lex"
 )
+
+// OptimizeOperation will if both left and right nodes are constants return
+// a constant node with the result of some function.
+// If either are not constant then a new node will be created with the supplied handler
+// attached.
+func OptimizeOperation( token *lex.Token, left *context.Node, right *context.Node, h context.NodeHandler, f func(*context.Value,*context.Value)(*context.Value,error) ) (*context.Node,error) {
+  if left.IsConstant() && right.IsConstant() {
+    c, err := f( left.Value(), right.Value() )
+    if err != nil {
+      return nil, err
+    }
+    return context.NewConstant( token, c ), nil
+  } else {
+    return context.NewNode( token, h, left, right ), nil
+  }
+}
 
 func (p *Parser) parse_additive() (*context.Node,error) {
 
@@ -24,9 +41,15 @@ func (p *Parser) parse_additive() (*context.Node,error) {
 
     switch token.Text() {
       case "+":
-        expr = context.NewNode( token, exec.AddHandler, expr, right )
+        expr, err = OptimizeOperation( token, expr, right, exec.AddHandler, exec.Add )
+        if err != nil {
+          return nil, err
+        }
       case "-":
-        expr = context.NewNode( token, exec.SubHandler, expr, right )
+        expr, err = OptimizeOperation( token, expr, right, exec.SubHandler, exec.Sub )
+        if err != nil {
+          return nil, err
+        }
     }
 
     token = p.lexer.Peek()
@@ -53,9 +76,13 @@ func (p *Parser) parse_multiplicative() (*context.Node,error) {
 
     switch token.Text() {
       case "*":
-        expr = context.NewNode( token, exec.MultHandler, expr, right )
+        expr, err = OptimizeOperation( token, expr, right, exec.MultHandler, exec.Mult )
+        if err != nil {
+          return nil, err
+        }
+
       case "/":
-        expr = context.NewNode( token, exec.DivHandler, expr, right )
+        expr, err = OptimizeOperation( token, expr, right, exec.DivHandler, exec.Div )
     }
 
     token = p.lexer.Peek()
