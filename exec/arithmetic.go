@@ -36,25 +36,6 @@ func NegHandler( m *context.Context, n *context.Node ) error {
 // If an Integer then the result will be an integer.
 // For booleans then it's integer equivalent is used.
 // Strings will be concatenated.
-func AddHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
-  }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  c, err := Add( a, b )
-  if err == nil {
-    m.Push( c )
-  }
-  return err
-}
-
-// Add two Values
 func Add( a *context.Value, b *context.Value ) (*context.Value,error) {
   if a != nil && b != nil {
     switch a.OperationType( b ) {
@@ -76,25 +57,6 @@ func Add( a *context.Value, b *context.Value ) (*context.Value,error) {
 // If one value is a float then the result will be a float.
 // If an Integer then the result will be an integer.
 // For booleans then it's integer equivalent is used.
-func SubHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
-  }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  c, err := Sub( a, b )
-  if err == nil {
-    m.Push( c )
-  }
-  return err
-}
-
-// Subtract two Values
 func Sub( a *context.Value, b *context.Value ) (*context.Value,error) {
   if a != nil && b != nil {
     switch a.OperationType( b ) {
@@ -115,25 +77,6 @@ func Sub( a *context.Value, b *context.Value ) (*context.Value,error) {
 // If one value is a float then the result will be a float.
 // If an Integer then the result will be an integer.
 // For booleans then it's integer equivalent is used.
-func MultHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
-  }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  c, err := Mult( a, b )
-  if err == nil {
-    m.Push( c )
-  }
-  return err
-}
-
-// Multiply two Values
 func Mult( a *context.Value, b *context.Value ) (*context.Value,error) {
   if a != nil && b != nil {
     switch a.OperationType( b ) {
@@ -153,25 +96,6 @@ func Mult( a *context.Value, b *context.Value ) (*context.Value,error) {
 // If an Integer then the result will be an integer.
 // For booleans then it's integer equivalent is used.
 // An error will be returned is a divide-by-zero would occur.
-func DivHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
-  }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  c, err := Div( a, b )
-  if err == nil {
-    m.Push( c )
-  }
-  return err
-}
-
-// Divide two Values
 func Div( a *context.Value, b *context.Value ) (*context.Value,error) {
   if a != nil && b != nil {
     if b.IsZero() {

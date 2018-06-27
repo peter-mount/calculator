@@ -11,7 +11,7 @@ import (
 // a constant node with the result of some function.
 // If either are not constant then a new node will be created with the supplied handler
 // attached.
-func OptimizeOperation( token *lex.Token, left *context.Node, right *context.Node, h context.NodeHandler, f func(*context.Value,*context.Value)(*context.Value,error) ) (*context.Node,error) {
+func OptimizeOperation( token *lex.Token, left *context.Node, right *context.Node, f func(*context.Value,*context.Value)(*context.Value,error) ) (*context.Node,error) {
   if left.IsConstant() && right.IsConstant() {
     c, err := f( left.Value(), right.Value() )
     if err != nil {
@@ -19,7 +19,27 @@ func OptimizeOperation( token *lex.Token, left *context.Node, right *context.Nod
     }
     return context.NewConstant( token, c ), nil
   } else {
-    return context.NewNode( token, h, left, right ), nil
+    return context.NewNode(
+      token,
+      func( m *context.Context, n *context.Node ) error {
+        err := n.Invoke2(m)
+        if err != nil {
+          return err
+        }
+
+        a, b, err := m.Pop2()
+        if err != nil {
+          return err
+        }
+
+        c, err := f( a, b )
+        if err == nil {
+          m.Push( c )
+        }
+        return err
+      },
+      left,
+      right ), nil
   }
 }
 
@@ -41,12 +61,12 @@ func (p *Parser) parse_additive() (*context.Node,error) {
 
     switch token.Text() {
       case "+":
-        expr, err = OptimizeOperation( token, expr, right, exec.AddHandler, exec.Add )
+        expr, err = OptimizeOperation( token, expr, right, exec.Add )
         if err != nil {
           return nil, err
         }
       case "-":
-        expr, err = OptimizeOperation( token, expr, right, exec.SubHandler, exec.Sub )
+        expr, err = OptimizeOperation( token, expr, right, exec.Sub )
         if err != nil {
           return nil, err
         }
@@ -76,13 +96,13 @@ func (p *Parser) parse_multiplicative() (*context.Node,error) {
 
     switch token.Text() {
       case "*":
-        expr, err = OptimizeOperation( token, expr, right, exec.MultHandler, exec.Mult )
+        expr, err = OptimizeOperation( token, expr, right, exec.Mult )
         if err != nil {
           return nil, err
         }
 
       case "/":
-        expr, err = OptimizeOperation( token, expr, right, exec.DivHandler, exec.Div )
+        expr, err = OptimizeOperation( token, expr, right, exec.Div )
     }
 
     token = p.lexer.Peek()

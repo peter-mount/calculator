@@ -23,12 +23,37 @@ func (p *Parser) parse_logic() (*context.Node,error) {
 
     switch token.Text() {
       case "==":
-        expr, err = OptimizeOperation( token, expr, right, exec.EqualHandler, exec.Equal )
+        expr, err = OptimizeOperation( token, expr, right, exec.Equal )
         if err != nil {
           return nil, err
         }
+
       case "!=":
-        expr, err = OptimizeOperation( token, expr, right, exec.NotEqualHandler, exec.NotEqual )
+        expr, err = OptimizeOperation( token, expr, right, exec.NotEqual )
+        if err != nil {
+          return nil, err
+        }
+
+      case "<":
+        expr, err = OptimizeOperation( token, expr, right, exec.LessThan )
+        if err != nil {
+          return nil, err
+        }
+
+      case "<=":
+        expr, err = OptimizeOperation( token, expr, right, exec.LessThanEqual )
+        if err != nil {
+          return nil, err
+        }
+
+      case ">=":
+        expr, err = OptimizeOperation( token, expr, right, exec.GreaterThanEqual )
+        if err != nil {
+          return nil, err
+        }
+
+      case ">":
+        expr, err = OptimizeOperation( token, expr, right, exec.GreaterThan )
         if err != nil {
           return nil, err
         }

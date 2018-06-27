@@ -23,24 +23,6 @@ func NullHandler( m *context.Context, n *context.Node ) error {
 }
 
 // Compare two values for equality
-func EqualHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
-  }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  c, err := Equal( a, b )
-  if err == nil {
-    m.Push( c )
-  }
-  return err
-}
-
 func Equal( a *context.Value, b *context.Value ) (*context.Value,error) {
   if a==nil {
     return context.BoolValue( b == nil ), nil
@@ -50,24 +32,6 @@ func Equal( a *context.Value, b *context.Value ) (*context.Value,error) {
 }
 
 // Compare two values for inequality
-func NotEqualHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
-  }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  c, err := NotEqual( a, b )
-  if err == nil {
-    m.Push( c )
-  }
-  return err
-}
-
 func NotEqual( a *context.Value, b *context.Value ) (*context.Value,error) {
   if a==nil {
     return context.BoolValue( b != nil ), nil
@@ -77,107 +41,63 @@ func NotEqual( a *context.Value, b *context.Value ) (*context.Value,error) {
 }
 
 // a < b
-func LessThanHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
+func LessThan( a *context.Value, b *context.Value ) (*context.Value,error) {
+  if a != nil && b != nil {
+    switch a.Type() {
+      case context.VAR_INT:
+        return context.BoolValue( a.Int() < b.Int() ), nil
+      case context.VAR_FLOAT:
+        return context.BoolValue( a.Float() < b.Float() ), nil
+      case context.VAR_STRING:
+        return context.BoolValue( a.String() < b.String() ), nil
+    }
   }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  switch a.Type() {
-  case context.VAR_INT:
-      m.PushBool( a.Int() < b.Int() )
-    case context.VAR_FLOAT:
-      m.PushBool( a.Float() < b.Float() )
-    case context.VAR_STRING:
-      m.PushBool( a.String() < b.String() )
-    default:
-      m.PushBool( false )
-  }
-
-  return nil
+  return context.BoolValue( false ), nil
 }
 
 // a <= b
-func LessThanEqualHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
+func LessThanEqual( a *context.Value, b *context.Value ) (*context.Value,error) {
+  if a != nil && b != nil {
+    switch a.Type() {
+      case context.VAR_INT:
+        return context.BoolValue( a.Int() <= b.Int() ), nil
+      case context.VAR_FLOAT:
+        return context.BoolValue( a.Float() <= b.Float() ), nil
+      case context.VAR_STRING:
+        return context.BoolValue( a.String() <= b.String() ), nil
+    }
   }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  switch a.Type() {
-    case context.VAR_INT:
-      m.PushBool( a.Int() <= b.Int() )
-    case context.VAR_FLOAT:
-      m.PushBool( a.Float() <= b.Float() )
-    case context.VAR_STRING:
-      m.PushBool( a.String() <= b.String() )
-    default:
-      m.PushBool( false )
-  }
-
-  return nil
+  return context.BoolValue( false ), nil
 }
 
 // a >= b
-func GreaterThanEqualHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
+func GreaterThanEqual( a *context.Value, b *context.Value ) (*context.Value,error) {
+  if a != nil && b != nil {
+    switch a.Type() {
+      case context.VAR_INT:
+        return context.BoolValue( a.Int() >= b.Int() ), nil
+      case context.VAR_FLOAT:
+        return context.BoolValue( a.Float() >= b.Float() ), nil
+      case context.VAR_STRING:
+        return context.BoolValue( a.String() >= b.String() ), nil
+    }
   }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  switch a.Type() {
-    case context.VAR_INT:
-      m.PushBool( a.Int() >= b.Int() )
-    case context.VAR_FLOAT:
-      m.PushBool( a.Float() >= b.Float() )
-    case context.VAR_STRING:
-      m.PushBool( a.String() >= b.String() )
-    default:
-      m.PushBool( false )
-  }
-
-  return nil
+  return context.BoolValue( false ), nil
 }
 
 // a > b
-func GreaterThanHandler( m *context.Context, n *context.Node ) error {
-  err := n.Invoke2(m)
-  if err != nil {
-    return err
+func GreaterThan( a *context.Value, b *context.Value ) (*context.Value,error) {
+  if a != nil && b != nil {
+    switch a.Type() {
+      case context.VAR_INT:
+        return context.BoolValue( a.Int() > b.Int() ), nil
+      case context.VAR_FLOAT:
+        return context.BoolValue( a.Float() > b.Float() ), nil
+      case context.VAR_STRING:
+        return context.BoolValue( a.String() > b.String() ), nil
+    }
   }
-
-  a, b, err := m.Pop2()
-  if err != nil {
-    return err
-  }
-
-  switch a.Type() {
-    case context.VAR_INT:
-      m.PushBool( a.Int() > b.Int() )
-    case context.VAR_FLOAT:
-      m.PushBool( a.Float() > b.Float() )
-    case context.VAR_STRING:
-      m.PushBool( a.String() > b.String() )
-    default:
-      m.PushBool( false )
-  }
-
-  return nil
+  return context.BoolValue( false ), nil
 }
 
 // a between b and c
