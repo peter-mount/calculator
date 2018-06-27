@@ -1,6 +1,8 @@
-package exec
+package test
 
 import (
+  "github.com/peter-mount/calculator/debug"
+  "github.com/peter-mount/calculator/exec"
   "testing"
   "io"
   "os"
@@ -29,9 +31,9 @@ func TestParser_parse( t *testing.T ) {
   } else {
     defer f.Close()
 
-    HtmlTreeStart( f )
+    debug.HtmlTreeStart( f )
 
-    calc := &Calculator{}
+    calc := &exec.Calculator{}
 
     for _, e := range testParser_eq {
       parser := calc.Parser()
@@ -44,30 +46,30 @@ func TestParser_parse( t *testing.T ) {
       } else if parser.GetRoot() == nil {
         io.WriteString( f, "*** nil root ***" )
       } else {
-        HtmlTree( parser.GetRoot(), f, e )
+        debug.HtmlTree( parser.GetRoot(), f, e )
       }
     }
 
-    HtmlTreeEnd( f )
+    debug.HtmlTreeEnd( f )
   }
 }
 
 func TestParser_execute( t *testing.T ) {
-  results := []*Value {
-    IntValue( 3 ),
-    IntValue( 6 ),
-    IntValue( 7 ),
-    IntValue( 9 ),
-    BoolValue( true ),
-    BoolValue( true ),
-    BoolValue( true ),
-    BoolValue( false ),
-    BoolValue( false ),
-    BoolValue( false ),
+  results := []*exec.Value {
+    exec.IntValue( 3 ),
+    exec.IntValue( 6 ),
+    exec.IntValue( 7 ),
+    exec.IntValue( 9 ),
+    exec.BoolValue( true ),
+    exec.BoolValue( true ),
+    exec.BoolValue( true ),
+    exec.BoolValue( false ),
+    exec.BoolValue( false ),
+    exec.BoolValue( false ),
   }
 
-  calc := &Calculator{}
-  ctx := &Context{}
+  calc := &exec.Calculator{}
+  ctx := &exec.Context{}
 
   for i, eq := range testParser_eq {
 

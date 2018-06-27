@@ -1,21 +1,21 @@
-package exec
+package test
 
 import (
-  //"fmt"
+  "github.com/peter-mount/calculator/exec"
   "testing"
 )
 
 // Test basic math precedence
 func TestExec( t *testing.T ) {
 
-  calc := &Calculator{}
+  calc := &exec.Calculator{}
 
   err := calc.Parse( "1 + 1" )
   if err != nil {
     t.Error( err )
   }
 
-  ctx := &Context{}
+  ctx := &exec.Context{}
   err = calc.Execute( ctx )
   if err != nil {
     t.Error( err )

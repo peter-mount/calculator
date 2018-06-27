@@ -1,9 +1,11 @@
-package exec
+package test
 
 import (
-  "testing"
+  "github.com/peter-mount/calculator/debug"
+  "github.com/peter-mount/calculator/exec"
   "io"
   "os"
+  "testing"
 )
 
 func TestParser_math( t *testing.T ) {
@@ -29,9 +31,9 @@ func TestParser_math( t *testing.T ) {
   }
   defer f.Close()
 
-  HtmlTreeStart( f )
+  debug.HtmlTreeStart( f )
 
-  calc := &Calculator{}
+  calc := &exec.Calculator{}
 
   for _, e := range testdata {
     parser := calc.Parser()
@@ -44,18 +46,18 @@ func TestParser_math( t *testing.T ) {
     } else if parser.GetRoot() == nil {
       io.WriteString( f, "*** nil root ***" )
     } else {
-      HtmlTree( parser.GetRoot(), f, e )
+      debug.HtmlTree( parser.GetRoot(), f, e )
     }
   }
 
-  HtmlTreeEnd( f )
+  debug.HtmlTreeEnd( f )
 
   for _, eq := range testdata {
     err := calc.Parse( eq )
     if err != nil {
       t.Error( err )
     } else {
-      ctx := &Context{}
+      ctx := &exec.Context{}
       //ctx.SetVarInt( "a", 42 )
 
       err = calc.Execute( ctx )
@@ -65,8 +67,8 @@ func TestParser_math( t *testing.T ) {
       f.WriteString( "<p><strong>" )
       f.WriteString( eq )
       f.WriteString( "</strong> = ")
-      ctx.StackDump( f )
-      ctx.VarDump( f )
+      debug.StackDump( f, ctx )
+      debug.VarDump( f, ctx )
       f.WriteString( "</p> ")
     }
   }

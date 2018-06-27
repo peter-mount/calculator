@@ -2,9 +2,7 @@
 #
 # Runs all tests
 #
-for bin in \
-  exec \
-  lex
+for bin in test
 do
   echo "Testing ${bin}"
   go test -v github.com/peter-mount/calculator/${bin}
