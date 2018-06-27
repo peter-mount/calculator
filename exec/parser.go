@@ -2,18 +2,18 @@ package exec
 
 import (
   "fmt"
+  "github.com/peter-mount/calculator/lex"
   "strconv"
   "text/scanner"
 )
 
 type Parser struct {
   calculator   *Calculator
-  lexer        Lexer
+  lexer         lex.Lexer
   root         *Node
   funcs         FuncMap
   tokenType     rune
   token         string
-  Debug         bool
   precedence    int
 }
 
@@ -29,15 +29,6 @@ func (p *Parser) GetRoot() *Node {
 
 func (p *Parser) Parse( rule string ) error {
   p.lexer.Parse( rule )
-
-  if p.Debug {
-    fmt.Printf( " orig:%s\ntoken:", rule )
-    for _, t := range p.lexer.tokens {
-      fmt.Printf( "%s ", t.text )
-    }
-    fmt.Println()
-  }
-
   root, err := p.parse()
   p.root = root
   return err
@@ -67,7 +58,7 @@ func (p *Parser) parse_arithmetic() (*Node,error) {
 func (p *Parser) parse_parens() (*Node,error) {
 
   token := p.lexer.Peek()
-  if token.text == "(" {
+  if token.Text() == "(" {
     p.lexer.Next()
 
     expr, err := p.parse_arithmetic()
@@ -76,7 +67,7 @@ func (p *Parser) parse_parens() (*Node,error) {
     }
 
     token = p.lexer.Next()
-    if token.text != ")" {
+    if token.Text() != ")" {
       return nil, fmt.Errorf( "Expecting )" )
     }
     return expr, nil
@@ -92,7 +83,7 @@ func (p *Parser) parse_unary() (*Node,error) {
 
   token := p.lexer.Peek()
 
-  switch token.token {
+  switch token.Token() {
     case scanner.Ident:
       token = p.lexer.Next()
       /*
@@ -103,33 +94,33 @@ func (p *Parser) parse_unary() (*Node,error) {
         return n1, err
       }
       */
-      err = fmt.Errorf( "XXX Unknown token: \"%s\"", token.text )
+      err = fmt.Errorf( "XXX Unknown token: \"%s\"", token.Text() )
     case scanner.Int:
       token = p.lexer.Next()
-      iv, err := strconv.ParseInt( token.text, 10, 64 )
+      iv, err := strconv.ParseInt( token.Text(), 10, 64 )
       if err != nil {
         return nil, err
       }
-      expr = &Node{ token:token.text, value: IntValue( iv ) }
+      expr = &Node{ token:token.Text(), value: IntValue( iv ) }
 
     case scanner.Float:
       token = p.lexer.Next()
-      fv, err := strconv.ParseFloat( token.text, 64 )
+      fv, err := strconv.ParseFloat( token.Text(), 64 )
       if err != nil {
         return nil, err
       }
-      expr = &Node{ token:token.text, value: FloatValue( fv )  }
+      expr = &Node{ token:token.Text(), value: FloatValue( fv )  }
 
     case scanner.String:
       token = p.lexer.Next()
-      expr = &Node{ token:token.text, value: StringValue( token.text[1:len(token.text)-1] )  }
+      expr = &Node{ token:token.Text(), value: StringValue( token.Text()[1:len(token.Text())-1] )  }
 
-    case TOKEN_VARIABLE:
+    case lex.TOKEN_VARIABLE:
       token = p.lexer.Next()
-      expr = &Node{ tokenRune: TOKEN_VARIABLE, token: token.text, handler: getVarHandler }
+      expr = &Node{ tokenRune: lex.TOKEN_VARIABLE, token: token.Text(), handler: getVarHandler }
 
     default:
-      err = fmt.Errorf( "Unknown token: \"%s\"", token.text )
+      err = fmt.Errorf( "Unknown token: \"%s\"", token.Text() )
   }
 
   return expr, err

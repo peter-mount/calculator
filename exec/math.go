@@ -2,17 +2,18 @@ package exec
 
 import (
   "errors"
+  "github.com/peter-mount/calculator/lex"
   "math"
 )
 
 // parse_math1_handler creates a node for the current token but expects ( ) &
 // some arithmetic providing 1 response
-func (p *Parser) parse_math1_handler( token *Token, handler NodeHandler ) (*Node,error) {
+func (p *Parser) parse_math1_handler( token *lex.Token, handler NodeHandler ) (*Node,error) {
   token = p.lexer.Next()
 
   nextToken := p.lexer.Peek()
-  if nextToken.text != "(" {
-    return nil, errors.New( "Expected " + token.text + "(arg)" )
+  if nextToken.Text() != "(" {
+    return nil, errors.New( "Expected " + token.Text() + "(arg)" )
   }
 
   left, err := p.parse_parens()
@@ -20,7 +21,7 @@ func (p *Parser) parse_math1_handler( token *Token, handler NodeHandler ) (*Node
     return nil, err
   }
 
-  expr := &Node{ token:token.text, left:left, handler: handler }
+  expr := &Node{ token:token.Text(), left:left, handler: handler }
   return expr, nil
 }
 
@@ -30,7 +31,7 @@ func (p *Parser) parse_math() (*Node,error) {
   var err error
 
   token := p.lexer.Peek()
-  switch token.text {
+  switch token.Text() {
     case "abs":
       expr, err = p.parse_math1_handler( token, absHandler )
     case "acos":

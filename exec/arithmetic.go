@@ -12,7 +12,7 @@ func (p *Parser) parse_additive() (*Node,error) {
   }
 
   token := p.lexer.Peek()
-  for token.text == "+" || token.text == "-" {
+  for token.Text() == "+" || token.Text() == "-" {
     token = p.lexer.Next()
 
     right, err := p.parse_multiplicative()
@@ -20,11 +20,11 @@ func (p *Parser) parse_additive() (*Node,error) {
       return nil, err
     }
 
-    switch token.text {
+    switch token.Text() {
       case "+":
-        expr = &Node{ token:token.text, left:expr, right: right, handler: addHandler }
+        expr = &Node{ token:token.Text(), left:expr, right: right, handler: addHandler }
       case "-":
-        expr = &Node{ token:token.text, left:expr, right: right, handler: subHandler }
+        expr = &Node{ token:token.Text(), left:expr, right: right, handler: subHandler }
     }
 
     token = p.lexer.Peek()
@@ -41,7 +41,7 @@ func (p *Parser) parse_multiplicative() (*Node,error) {
   }
 
   token := p.lexer.Peek()
-  for token.text == "*" || token.text == "/" {
+  for token.Text() == "*" || token.Text() == "/" {
     token = p.lexer.Next()
 
     right, err := p.parse_negative()
@@ -49,11 +49,11 @@ func (p *Parser) parse_multiplicative() (*Node,error) {
       return nil, err
     }
 
-    switch token.text {
+    switch token.Text() {
       case "*":
-        expr = &Node{ token:token.text, left:expr, right: right, handler: multHandler }
+        expr = &Node{ token:token.Text(), left:expr, right: right, handler: multHandler }
       case "/":
-        expr = &Node{ token:token.text, left:expr, right: right, handler: divHandler }
+        expr = &Node{ token:token.Text(), left:expr, right: right, handler: divHandler }
     }
 
     token = p.lexer.Peek()
@@ -66,7 +66,7 @@ func (p *Parser) parse_multiplicative() (*Node,error) {
 func (p *Parser) parse_negative() (*Node,error) {
   token := p.lexer.Peek()
 
-  if token.text == "-" {
+  if token.Text() == "-" {
     token = p.lexer.Next()
 
     // Future: If we want "--" operator put test here
@@ -92,11 +92,11 @@ func (p *Parser) parse_negative() (*Node,error) {
       return &Node{ token:value.String(), value: value }, nil
     }
 
-    return &Node{ token:token.text, left:expr, handler: negHandler }, nil
+    return &Node{ token:token.Text(), left:expr, handler: negHandler }, nil
   }
 
   // Special case a + here means positive so skip the token as it's a nop
-  if token.text == "+" {
+  if token.Text() == "+" {
     token = p.lexer.Next()
     // Future: If we want "++" operator put test here
   }

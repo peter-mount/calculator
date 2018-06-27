@@ -1,10 +1,11 @@
-package exec
+package lex
 
 import (
   "strings"
   "text/scanner"
 )
 
+// A simple lexer used to tokenise raw text into something the Parser can handle
 type Lexer struct {
   tokens     []*Token
   pos           int
@@ -12,6 +13,7 @@ type Lexer struct {
   scanner       scanner.Scanner
 }
 
+// A parsed token from the Lexer
 type Token struct {
   token    rune
   text    string
@@ -111,4 +113,14 @@ func (l *Lexer) Peek() *Token {
 func (l *Lexer) Skip() *Token {
   l.Next()
   return l.Peek()
+}
+
+// Token returns the rune for this token
+func (t *Token) Token() rune {
+  return t.token
+}
+
+// Text returns the text of this token
+func (t *Token) Text() string {
+  return t.text
 }

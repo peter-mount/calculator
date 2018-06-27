@@ -3,13 +3,14 @@ package exec
 import (
   "errors"
   "fmt"
+  "github.com/peter-mount/calculator/lex"
   "text/scanner"
 )
 
 func (p *Parser) parse_statements() (*Node,error) {
   block := &Node{token: "{ }", handler: invokeAllHandler}
   token := p.lexer.Peek()
-  for token.token != scanner.EOF {
+  for token.Token() != scanner.EOF {
     expr, err := p.parse_statement_block()
     if err != nil {
       return nil, err
@@ -25,12 +26,12 @@ func (p *Parser) parse_statements() (*Node,error) {
 func (p *Parser) parse_statement_block() (*Node,error) {
 
   token := p.lexer.Peek()
-  if token.text == "{" {
+  if token.Text() == "{" {
     p.lexer.Next()
 
     block := &Node{token: "{ }", handler: invokeScopeHandler}
     token := p.lexer.Peek()
-    for token.token != scanner.EOF && token.text != "}" {
+    for token.Token() != scanner.EOF && token.Text() != "}" {
       expr, err := p.parse_statement()
       if err != nil {
         return nil, err
@@ -40,7 +41,7 @@ func (p *Parser) parse_statement_block() (*Node,error) {
       }
       token = p.lexer.Peek()
     }
-    if token.text != "}" {
+    if token.Text() != "}" {
       return nil, fmt.Errorf( "Expecting }" )
     }
     return block, nil
@@ -54,11 +55,11 @@ func (p *Parser) parse_statement() (*Node,error) {
 
   // Skip ; as optional terminators
   token := p.lexer.Peek()
-  if token.text == "}" {
+  if token.Text() == "}" {
     token = p.lexer.Next()
     return nil, nil
   }
-  for token.text == ";" {
+  for token.Text() == ";" {
     token = p.lexer.Skip()
   }
 
@@ -68,7 +69,7 @@ func (p *Parser) parse_statement() (*Node,error) {
   }
 
   token = p.lexer.Peek()
-  for token.text == "=" && expr != nil && expr.tokenRune == TOKEN_VARIABLE {
+  for token.Text() == "=" && expr != nil && expr.tokenRune == lex.TOKEN_VARIABLE {
     token = p.lexer.Next()
 
     left, err := p.parse_arithmetic()

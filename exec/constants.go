@@ -24,9 +24,9 @@ var constants = map[string]*Value{
 func (p *Parser) parse_constants() (*Node,error) {
   token := p.lexer.Peek()
 
-  if value, exists := constants[token.text]; exists {
+  if value, exists := constants[token.Text()]; exists {
     token = p.lexer.Next()
-    return &Node{ token:token.text, value: value }, nil
+    return &Node{ token:token.Text(), value: value }, nil
   }
 
   expr, err := p.parse_unary()

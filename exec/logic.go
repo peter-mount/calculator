@@ -8,7 +8,7 @@ func (p *Parser) parse_logic() (*Node,error) {
   }
 
   token := p.lexer.Peek()
-  for token.text == "==" || token.text == "!=" {
+  for token.Text() == "==" || token.Text() == "!=" {
     token = p.lexer.Next()
 
     right, err := p.parse_additive()
@@ -16,11 +16,11 @@ func (p *Parser) parse_logic() (*Node,error) {
       return nil, err
     }
 
-    switch token.text {
+    switch token.Text() {
       case "==":
-        expr = &Node{ token:token.text, left:expr, right: right, handler: equalHandler }
+        expr = &Node{ token:token.Text(), left:expr, right: right, handler: equalHandler }
       case "!=":
-        expr = &Node{ token:token.text, left:expr, right: right, handler: notEqualHandler }
+        expr = &Node{ token:token.Text(), left:expr, right: right, handler: notEqualHandler }
     }
 
     token = p.lexer.Peek()
