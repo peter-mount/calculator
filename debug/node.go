@@ -1,7 +1,8 @@
-package exec
+package debug
 
 import (
   "fmt"
+  "github.com/peter-mount/calculator/exec"
   "io"
 )
 
@@ -24,14 +25,15 @@ import (
 // }
 // HtmlTreeEnd( f )
 //
-func HtmlTree( r *Node, w io.Writer, title string ) {
-  m := make( map[*Node]interface{} )
+func HtmlTree( r *exec.Node, w io.Writer, title string ) {
+  m := make( map[*exec.Node]interface{} )
   c := &nodeCell{t:title}
   if r != nil {
     logTree( m, c, r )
   }
   c.print( w )
 }
+
 func HtmlTreeStart( w io.Writer ) {
   //body > table
   io.WriteString( w, "<html><head><style>" )
@@ -42,31 +44,27 @@ func HtmlTreeStart( w io.Writer ) {
   io.WriteString( w, " th {width:50%;}" )
   io.WriteString( w, "</style><body>" )
 }
+
 func HtmlTreeEnd( w io.Writer ) {
   io.WriteString( w, "</body></html>" )
 }
 
-func logTree( m map[*Node]interface{}, p *nodeCell, r *Node ) {
+func logTree( m map[*exec.Node]interface{}, p *nodeCell, r *exec.Node ) {
   // Prevent infinite loops - should not happen except if a bug happens in the tree
   if _, visited := m[r]; visited {
     // We've already visited this which is an error
-    p.append( "Looping:&nbsp;" + r.token )
+    p.append( "Looping:&nbsp;" + r.Token() )
     return
   }
   m[r] = nil
   defer delete( m, r )
 
-  c := p.append( r.token )
+  c := p.append( r.Token() )
 
-  if r.left != nil {
-    logTree( m, c, r.left )
-  }
-  if r.right != nil {
-    logTree( m, c, r.right )
-  }
-  for _, n := range r.list {
+  r.ForEachAll( func(n *exec.Node) error {
     logTree( m, c, n )
-  }
+    return nil
+  })
 }
 
 type nodeCell struct {
@@ -111,48 +109,4 @@ func logMax( a, b int ) int {
     return a
   }
   return b
-}
-
-// StackDump writes the current state of the stack to a Writer
-func (c *Context) StackDump( w io.Writer) {
-  io.WriteString( w, "[")
-  for i, v := range c.stack {
-    if i>0 {
-      io.WriteString( w, ", ")
-    }
-    s := v.Type() == VAR_STRING
-    if s {
-      io.WriteString( w, "\"")
-    }
-    io.WriteString( w, v.String() )
-    if s {
-      io.WriteString( w, "\"")
-    }
-  }
-  io.WriteString( w, "]\n")
-}
-
-func (c *Context) VarDump( w io.Writer ) {
-  for i, m := range c.vars {
-    if i>0 {
-      io.WriteString( w, ", ")
-    }
-    io.WriteString( w, "{")
-    for k, v := range m {
-      io.WriteString( w, "\"")
-      io.WriteString( w, k )
-      io.WriteString( w, "\"=")
-
-      s := v.Type() == VAR_STRING
-      if s {
-        io.WriteString( w, "\"")
-      }
-      io.WriteString( w, v.String() )
-      if s {
-        io.WriteString( w, "\"")
-      }
-    }
-    io.WriteString( w, "}")
-  }
-  io.WriteString( w, "\n")
 }

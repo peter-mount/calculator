@@ -10,6 +10,28 @@ type Context struct {
   vars    []map[string]*Value
 }
 
+// Stack returns a copy of the current stack
+func (c *Context) Stack() []*Value {
+  var r []*Value
+  for _,v := range c.stack {
+    r = append( r, v )
+  }
+  return r
+}
+
+// Vars returns a copy of the context's variables
+func (c *Context) Vars() []map[string]*Value {
+  var r []map[string]*Value
+  for _,vm := range c.vars {
+    rm := make( map[string]*Value )
+    r = append( r, rm )
+    for k, v := range vm {
+      rm[k] = v
+    }
+  }
+  return r
+}
+
 // Push a value onto the stack
 func (c *Context) Push( v *Value ) {
   c.stack = append( c.stack, v )

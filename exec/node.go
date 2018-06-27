@@ -66,3 +66,55 @@ func (n *Node) Invoke2( m *Context ) error {
 
   return n.InvokeRhs(m)
 }
+
+// Token returns this nodes token text
+func (n *Node) Token() string {
+  return n.token
+}
+
+// Rune returns this nodes rune (optional)
+func (n *Node) Rune() rune {
+  return n.tokenRune
+}
+
+// Value returns this nodes value or nil
+func (n *Node) Value() *Value {
+  return n.value
+}
+
+// Left returns the left hand node or nil
+func (n *Node) Left() *Node {
+  return n.left
+}
+
+// Right returns the right hand node or nil
+func (n *Node) Right() *Node {
+  return n.left
+}
+
+// ForEach invokes a function for each node in this nodes list
+func (n *Node) ForEach( f func(*Node) error ) error {
+  for _, n1 := range n.list {
+    err := f(n1)
+    if err != nil {
+      return err
+    }
+  }
+  return nil
+}
+
+// ForEachAll invokes a function for the left & right hand nodes (if present)
+// and for any node within this nodes list
+func (n *Node) ForEachAll( f func(*Node) error ) error {
+  var err error
+  if n.left != nil {
+    err = f(n.left)
+  }
+  if err == nil && n.right != nil {
+    err = f(n.right)
+  }
+  if err == nil {
+    err = n.ForEach( f )
+  }
+  return err
+}
