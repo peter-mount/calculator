@@ -3,6 +3,7 @@ package main
 import (
   "flag"
   "fmt"
+  "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/exec"
   "os"
 )
@@ -15,10 +16,13 @@ func main() {
 
   for _, arg := range flag.Args() {
     errorExit( calc.Parse( arg ) )
-    ctx := &exec.Context{}
+
+    ctx := &context.Context{}
     errorExit( calc.Execute( ctx ) )
+
     result, err := ctx.Pop()
     errorExit(err)
+    
     fmt.Printf("%v\n",result)
   }
 

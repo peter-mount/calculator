@@ -2,7 +2,7 @@ package debug
 
 import (
   "fmt"
-  "github.com/peter-mount/calculator/exec"
+  "github.com/peter-mount/calculator/context"
   "io"
 )
 
@@ -25,8 +25,8 @@ import (
 // }
 // HtmlTreeEnd( f )
 //
-func HtmlTree( r *exec.Node, w io.Writer, title string ) {
-  m := make( map[*exec.Node]interface{} )
+func HtmlTree( r *context.Node, w io.Writer, title string ) {
+  m := make( map[*context.Node]interface{} )
   c := &nodeCell{t:title}
   if r != nil {
     logTree( m, c, r )
@@ -49,19 +49,19 @@ func HtmlTreeEnd( w io.Writer ) {
   io.WriteString( w, "</body></html>" )
 }
 
-func logTree( m map[*exec.Node]interface{}, p *nodeCell, r *exec.Node ) {
+func logTree( m map[*context.Node]interface{}, p *nodeCell, r *context.Node ) {
   // Prevent infinite loops - should not happen except if a bug happens in the tree
   if _, visited := m[r]; visited {
     // We've already visited this which is an error
-    p.append( "Looping:&nbsp;" + r.Token() )
+    p.append( "Looping:&nbsp;" + r.Token().Text() )
     return
   }
   m[r] = nil
   defer delete( m, r )
 
-  c := p.append( r.Token() )
+  c := p.append( r.Token().Text() )
 
-  r.ForEachAll( func(n *exec.Node) error {
+  r.ForEachAll( func(n *context.Node) error {
     logTree( m, c, n )
     return nil
   })

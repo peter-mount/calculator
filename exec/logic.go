@@ -1,6 +1,10 @@
 package exec
 
-func (p *Parser) parse_logic() (*Node,error) {
+import (
+  "github.com/peter-mount/calculator/context"
+)
+
+func (p *Parser) parse_logic() (*context.Node,error) {
 
   expr, err := p.parse_additive()
   if err != nil {
@@ -18,9 +22,9 @@ func (p *Parser) parse_logic() (*Node,error) {
 
     switch token.Text() {
       case "==":
-        expr = &Node{ token:token.Text(), left:expr, right: right, handler: equalHandler }
+        expr = context.NewNode( token, equalHandler, expr, right )
       case "!=":
-        expr = &Node{ token:token.Text(), left:expr, right: right, handler: notEqualHandler }
+        expr = context.NewNode( token, notEqualHandler, expr, right )
     }
 
     token = p.lexer.Peek()
@@ -29,22 +33,22 @@ func (p *Parser) parse_logic() (*Node,error) {
   return expr, err
 }
 
-func trueHandler( m *Context, n *Node ) error {
-  m.Push( &trueValue )
+func trueHandler( m *context.Context, n *context.Node ) error {
+  m.PushBool( true )
   return nil
 }
 
-func falseHandler( m *Context, n *Node ) error {
-  m.Push( &falseValue )
+func falseHandler( m *context.Context, n *context.Node ) error {
+  m.PushBool( false )
   return nil
 }
 
-func nullHandler( m *Context, n *Node ) error {
-  m.Push( &nullValue )
+func nullHandler( m *context.Context, n *context.Node ) error {
+  m.PushNull()
   return nil
 }
 
-func equalHandler( m *Context, n *Node ) error {
+func equalHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -64,7 +68,7 @@ func equalHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func notEqualHandler( m *Context, n *Node ) error {
+func notEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -84,7 +88,7 @@ func notEqualHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func lessThanHandler( m *Context, n *Node ) error {
+func lessThanHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -96,11 +100,11 @@ func lessThanHandler( m *Context, n *Node ) error {
   }
 
   switch a.Type() {
-    case VAR_INT:
+  case context.VAR_INT:
       m.PushBool( a.Int() < b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushBool( a.Float() < b.Float() )
-    case VAR_STRING:
+    case context.VAR_STRING:
       m.PushBool( a.String() < b.String() )
     default:
       m.PushBool( false )
@@ -109,7 +113,7 @@ func lessThanHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func lessThanEqualHandler( m *Context, n *Node ) error {
+func lessThanEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -121,11 +125,11 @@ func lessThanEqualHandler( m *Context, n *Node ) error {
   }
 
   switch a.Type() {
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushBool( a.Int() <= b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushBool( a.Float() <= b.Float() )
-    case VAR_STRING:
+    case context.VAR_STRING:
       m.PushBool( a.String() <= b.String() )
     default:
       m.PushBool( false )
@@ -134,7 +138,7 @@ func lessThanEqualHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func greaterThanEqualHandler( m *Context, n *Node ) error {
+func greaterThanEqualHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -146,11 +150,11 @@ func greaterThanEqualHandler( m *Context, n *Node ) error {
   }
 
   switch a.Type() {
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushBool( a.Int() >= b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushBool( a.Float() >= b.Float() )
-    case VAR_STRING:
+    case context.VAR_STRING:
       m.PushBool( a.String() >= b.String() )
     default:
       m.PushBool( false )
@@ -159,7 +163,7 @@ func greaterThanEqualHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func greaterThanHandler( m *Context, n *Node ) error {
+func greaterThanHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -171,11 +175,11 @@ func greaterThanHandler( m *Context, n *Node ) error {
   }
 
   switch a.Type() {
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushBool( a.Int() > b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushBool( a.Float() > b.Float() )
-    case VAR_STRING:
+    case context.VAR_STRING:
       m.PushBool( a.String() > b.String() )
     default:
       m.PushBool( false )
@@ -184,7 +188,7 @@ func greaterThanHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func betweenHandler( m *Context, n *Node ) error {
+func betweenHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -203,10 +207,10 @@ func betweenHandler( m *Context, n *Node ) error {
   }
 
   switch a.Type() {
-    case VAR_INT:
+    case context.VAR_INT:
       ci := c.Int()
       m.PushBool( ci >= a.Int() && ci <= b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       cf := c.Float()
       m.PushBool( cf >= a.Float() && cf <= b.Float() )
     default:
@@ -215,7 +219,7 @@ func betweenHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func andHandler( m *Context, n *Node ) error {
+func andHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -230,7 +234,7 @@ func andHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func orHandler( m *Context, n *Node ) error {
+func orHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -245,7 +249,7 @@ func orHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func notHandler( m *Context, n *Node ) error {
+func notHandler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
     return err

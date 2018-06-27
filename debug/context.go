@@ -1,12 +1,12 @@
 package debug
 
 import (
-  "github.com/peter-mount/calculator/exec"
+  "github.com/peter-mount/calculator/context"
   "io"
 )
 
-func write( w io.Writer, v *exec.Value ) {
-  s := v.Type() == exec.VAR_STRING
+func write( w io.Writer, v *context.Value ) {
+  s := v.Type() == context.VAR_STRING
   if s {
     io.WriteString( w, "\"")
   }
@@ -17,7 +17,7 @@ func write( w io.Writer, v *exec.Value ) {
 }
 
 // StackDump writes the current state of the stack to a Writer
-func StackDump( w io.Writer, c *exec.Context) {
+func StackDump( w io.Writer, c *context.Context) {
   io.WriteString( w, "[")
   for i, v := range c.Stack() {
     if i>0 {
@@ -28,7 +28,7 @@ func StackDump( w io.Writer, c *exec.Context) {
   io.WriteString( w, "]\n")
 }
 
-func VarDump( w io.Writer, c *exec.Context ) {
+func VarDump( w io.Writer, c *context.Context ) {
   for i, m := range c.Vars() {
     if i>0 {
       io.WriteString( w, ", ")

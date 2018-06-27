@@ -1,6 +1,7 @@
 package test
 
 import (
+  "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/debug"
   "github.com/peter-mount/calculator/exec"
   "io"
@@ -57,7 +58,7 @@ func TestParser_math( t *testing.T ) {
     if err != nil {
       t.Error( err )
     } else {
-      ctx := &exec.Context{}
+      ctx := &context.Context{}
       //ctx.SetVarInt( "a", 42 )
 
       err = calc.Execute( ctx )

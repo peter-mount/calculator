@@ -1,16 +1,16 @@
 package test
 
 import (
-  "github.com/peter-mount/calculator/exec"
+  "github.com/peter-mount/calculator/context"
   "testing"
 )
 
 // Test push/pop works & we detect an empty stack
 func TestContext_Pop( t *testing.T ) {
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
 
   // Push a value & expect just 1 back
-  ctx.Push( exec.NullValue() )
+  ctx.Push( context.NullValue() )
   if v, err := ctx.Pop(); err != nil {
     t.Error( "Stack underflow" )
   } else if !v.IsNull() {
@@ -25,11 +25,11 @@ func TestContext_Pop( t *testing.T ) {
 
 // Test pop2 works
 func TestContext_Pop2( t *testing.T ) {
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
 
   // Push a value & expect just 1 back
-  ctx.Push( exec.IntValue(1) )
-  ctx.Push( exec.IntValue(2) )
+  ctx.Push( context.IntValue(1) )
+  ctx.Push( context.IntValue(2) )
 
   // This should pull them back off, a=1 & b=2
   a, b, err := ctx.Pop2()
@@ -50,7 +50,7 @@ func TestContext_Pop2( t *testing.T ) {
 }
 
 func TestContext_PushBool( t *testing.T ) {
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
 
   // Push a value & expect just 1 back
   ctx.PushBool( true )
@@ -58,7 +58,7 @@ func TestContext_PushBool( t *testing.T ) {
   if err != nil {
     t.Error( "Stack underflow" )
   }
-  if v.Type() != exec.VAR_BOOL {
+  if v.Type() != context.VAR_BOOL {
     t.Error( "Not bool" )
   }
   if !v.Bool() {
@@ -67,7 +67,7 @@ func TestContext_PushBool( t *testing.T ) {
 }
 
 func TestContext_PushInt( t *testing.T ) {
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
 
   // Push a value & expect just 1 back
   ctx.PushInt( 42 )
@@ -75,7 +75,7 @@ func TestContext_PushInt( t *testing.T ) {
   if err != nil {
     t.Error( "Stack underflow" )
   }
-  if v.Type() != exec.VAR_INT {
+  if v.Type() != context.VAR_INT {
     t.Error( "Not int" )
   }
   if v.Int() != 42 {
@@ -84,7 +84,7 @@ func TestContext_PushInt( t *testing.T ) {
 }
 
 func TestContext_PushFloat( t *testing.T ) {
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
 
   // Push a value & expect just 1 back
   ctx.PushFloat( 3.14159 )
@@ -92,7 +92,7 @@ func TestContext_PushFloat( t *testing.T ) {
   if err != nil {
     t.Error( "Stack underflow" )
   }
-  if v.Type() != exec.VAR_FLOAT {
+  if v.Type() != context.VAR_FLOAT {
     t.Error( "Not float" )
   }
   if v.Float() != 3.14159 {
@@ -101,7 +101,7 @@ func TestContext_PushFloat( t *testing.T ) {
 }
 
 func TestContext_PushString( t *testing.T ) {
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
 
   s := "Arthur Dent"
 
@@ -111,7 +111,7 @@ func TestContext_PushString( t *testing.T ) {
   if err != nil {
     t.Error( "Stack underflow" )
   }
-  if v.Type() != exec.VAR_STRING {
+  if v.Type() != context.VAR_STRING {
     t.Error( "Not string" )
   }
   if v.String() != s {
@@ -120,12 +120,12 @@ func TestContext_PushString( t *testing.T ) {
 }
 
 func TestContext_Swap( t *testing.T ) {
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
 
   // Same as Pop2 test but here we push them as 2,1 then swap which should
   // give us 1,2 which Pop2 returns correctly
-  ctx.Push( exec.IntValue(2) )
-  ctx.Push( exec.IntValue(1) )
+  ctx.Push( context.IntValue(2) )
+  ctx.Push( context.IntValue(1) )
 
   // Test swap
   ctx.Swap()

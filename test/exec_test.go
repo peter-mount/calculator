@@ -1,6 +1,7 @@
 package test
 
 import (
+  "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/exec"
   "testing"
 )
@@ -15,7 +16,7 @@ func TestExec( t *testing.T ) {
     t.Error( err )
   }
 
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
   err = calc.Execute( ctx )
   if err != nil {
     t.Error( err )

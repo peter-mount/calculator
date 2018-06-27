@@ -2,10 +2,11 @@ package exec
 
 import (
   "errors"
+  "github.com/peter-mount/calculator/context"
 )
 
 type Calculator struct {
-  root *Node
+  root *context.Node
 }
 
 func (c *Calculator) Parse( s string ) error {
@@ -21,7 +22,7 @@ func (c *Calculator) Parse( s string ) error {
   return nil
 }
 
-func (c *Calculator) Execute( ctx *Context ) error {
+func (c *Calculator) Execute( ctx *context.Context ) error {
   if c.root == nil {
     return errors.New( "Parse() required first" )
   }

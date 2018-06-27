@@ -2,9 +2,10 @@ package exec
 
 import (
   "errors"
+  "github.com/peter-mount/calculator/context"
 )
 
-func (p *Parser) parse_additive() (*Node,error) {
+func (p *Parser) parse_additive() (*context.Node,error) {
 
   expr, err := p.parse_multiplicative()
   if err != nil {
@@ -22,9 +23,9 @@ func (p *Parser) parse_additive() (*Node,error) {
 
     switch token.Text() {
       case "+":
-        expr = &Node{ token:token.Text(), left:expr, right: right, handler: addHandler }
+        expr = context.NewNode( token, addHandler, expr, right )
       case "-":
-        expr = &Node{ token:token.Text(), left:expr, right: right, handler: subHandler }
+        expr = context.NewNode( token, subHandler, expr, right )
     }
 
     token = p.lexer.Peek()
@@ -33,7 +34,7 @@ func (p *Parser) parse_additive() (*Node,error) {
   return expr, err
 }
 
-func (p *Parser) parse_multiplicative() (*Node,error) {
+func (p *Parser) parse_multiplicative() (*context.Node,error) {
 
   expr, err := p.parse_negative()
   if err != nil {
@@ -51,9 +52,9 @@ func (p *Parser) parse_multiplicative() (*Node,error) {
 
     switch token.Text() {
       case "*":
-        expr = &Node{ token:token.Text(), left:expr, right: right, handler: multHandler }
+        expr = context.NewNode( token, multHandler, expr, right )
       case "/":
-        expr = &Node{ token:token.Text(), left:expr, right: right, handler: divHandler }
+        expr = context.NewNode( token, divHandler, expr, right )
     }
 
     token = p.lexer.Peek()
@@ -63,7 +64,7 @@ func (p *Parser) parse_multiplicative() (*Node,error) {
 }
 
 // Handles the special case of -value. If value is a *Value then we negate it here
-func (p *Parser) parse_negative() (*Node,error) {
+func (p *Parser) parse_negative() (*context.Node,error) {
   token := p.lexer.Peek()
 
   if token.Text() == "-" {
@@ -77,22 +78,22 @@ func (p *Parser) parse_negative() (*Node,error) {
     }
 
     // If expr is a value then we can just negate it now
-    if expr.value != nil {
-      value := expr.value
+    if expr.Value() != nil {
+      value := expr.Value()
       switch value.Type() {
-        case VAR_BOOL:
-          value = BoolValue( !value.Bool() )
-        case VAR_INT:
-          value = IntValue( -value.Int() )
-        case VAR_FLOAT:
-          value = FloatValue( -value.Float() )
+        case context.VAR_BOOL:
+          value = context.BoolValue( !value.Bool() )
+        case context.VAR_INT:
+          value = context.IntValue( -value.Int() )
+        case context.VAR_FLOAT:
+          value = context.FloatValue( -value.Float() )
         default:
           return nil, errors.New( "Unsupported type for neg" )
       }
-      return &Node{ token:value.String(), value: value }, nil
+      return context.NewConstant( token, value), nil
     }
 
-    return &Node{ token:token.Text(), left:expr, handler: negHandler }, nil
+    return context.NewNode( token, negHandler, expr, nil ), nil
   }
 
   // Special case a + here means positive so skip the token as it's a nop
@@ -105,7 +106,7 @@ func (p *Parser) parse_negative() (*Node,error) {
   return expr, err
 }
 
-func negHandler( m *Context, n *Node ) error {
+func negHandler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
     return err
@@ -117,11 +118,11 @@ func negHandler( m *Context, n *Node ) error {
   }
 
   switch a.Type() {
-    case VAR_BOOL:
+    case context.VAR_BOOL:
       m.PushBool( !a.Bool() )
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushInt( -a.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushFloat( -a.Float() )
     default:
       return errors.New( "Unsupported type for neg" )
@@ -130,23 +131,7 @@ func negHandler( m *Context, n *Node ) error {
   return nil
 }
 
-// OperationType returns the type of the suggested value when performing some
-// operation like addition or multiplication to keep the precision of the result.
-// For example, if a Value is an Integer but the passed value is Float then
-// we should use float.
-func (a *Value) OperationType( b *Value ) int {
-  t  := a.Type();
-  if a.Type() == VAR_STRING || b.Type() == VAR_STRING {
-    t = VAR_STRING
-  } else if a.Type() == VAR_FLOAT || b.Type() == VAR_FLOAT {
-    t = VAR_FLOAT
-  } else if a.Type() == VAR_INT || b.Type() == VAR_INT {
-    t = VAR_INT
-  }
-  return t
-}
-
-func addHandler( m *Context, n *Node ) error {
+func addHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -158,13 +143,13 @@ func addHandler( m *Context, n *Node ) error {
   }
 
   switch a.OperationType( b ) {
-    case VAR_BOOL:
+    case context.VAR_BOOL:
       m.PushInt( a.Int() + b.Int() )
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushInt( a.Int() + b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushFloat( a.Float() + b.Float() )
-    case VAR_STRING:
+    case context.VAR_STRING:
       m.PushString( a.String() + b.String() )
     default:
       return errors.New( "Unsupported type for add" )
@@ -173,7 +158,7 @@ func addHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func subHandler( m *Context, n *Node ) error {
+func subHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -185,11 +170,11 @@ func subHandler( m *Context, n *Node ) error {
   }
 
   switch a.OperationType( b ) {
-    case VAR_BOOL:
+    case context.VAR_BOOL:
       m.PushInt( a.Int() - b.Int() )
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushInt( a.Int() - b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushFloat( a.Float() - b.Float() )
     default:
       return errors.New( "Unsupported type for sub" )
@@ -198,7 +183,7 @@ func subHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func multHandler( m *Context, n *Node ) error {
+func multHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -210,11 +195,11 @@ func multHandler( m *Context, n *Node ) error {
   }
 
   switch a.OperationType( b ) {
-    case VAR_BOOL:
+    case context.VAR_BOOL:
       m.PushInt( a.Int() * b.Int() )
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushInt( a.Int() * b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushFloat( a.Float() * b.Float() )
     default:
       return errors.New( "Unsupported type for mult" )
@@ -223,7 +208,7 @@ func multHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func divHandler( m *Context, n *Node ) error {
+func divHandler( m *context.Context, n *context.Node ) error {
   err := n.Invoke2(m)
   if err != nil {
     return err
@@ -239,11 +224,11 @@ func divHandler( m *Context, n *Node ) error {
   }
 
   switch a.OperationType( b ) {
-    case VAR_BOOL:
+    case context.VAR_BOOL:
       m.PushInt( a.Int() / b.Int() )
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushInt( a.Int() / b.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushFloat( a.Float() / b.Float() )
     default:
       return errors.New( "Unsupported type for div" )
@@ -252,7 +237,7 @@ func divHandler( m *Context, n *Node ) error {
   return nil
 }
 
-func intHandler( m *Context, n *Node ) error {
+func intHandler( m *context.Context, n *context.Node ) error {
   err := n.InvokeLhs(m)
   if err != nil {
     return err
@@ -264,11 +249,11 @@ func intHandler( m *Context, n *Node ) error {
   }
 
   switch a.Type() {
-    case VAR_BOOL:
+    case context.VAR_BOOL:
       m.PushInt( a.Int() )
-    case VAR_INT:
+    case context.VAR_INT:
       m.PushInt( a.Int() )
-    case VAR_FLOAT:
+    case context.VAR_FLOAT:
       m.PushInt( a.Int() )
     default:
       return errors.New( "Unsupported type for int" )

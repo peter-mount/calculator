@@ -1,7 +1,12 @@
-package exec
+package context
+
+import (
+  "github.com/peter-mount/calculator/lex"
+)
 
 type NodeHandler func( *Context, *Node ) error
 
+/*
 type ParserDefinition func( *Parser, *Node, NodeHandler ) (*Node,error)
 
 type FuncMapEntry struct {
@@ -10,11 +15,11 @@ type FuncMapEntry struct {
 }
 
 type FuncMap map[string]NodeHandler
+*/
 
 // A node in the filter tree
 type Node struct {
-  tokenRune   rune
-  token       string
+  token      *lex.Token
   // left hand side
   left       *Node
   // right hand side
@@ -27,9 +32,25 @@ type Node struct {
   list     []*Node
 }
 
-func NewNode( t string, f NodeHandler ) *Node {
-  return &Node{ token: t, handler: f }
+var blockToken = &lex.Token{}
+
+func NewNode( t *lex.Token, f NodeHandler, left *Node, right *Node ) *Node {
+  return &Node{ token: t, handler: f, left: left, right: right }
 }
+
+func NewConstant( t *lex.Token, val *Value ) *Node {
+  return &Node{ token: t, value: val }
+}
+
+func NewBlock( f NodeHandler ) *Node {
+  return &Node{ token: blockToken, handler: f }
+}
+
+/*
+func NewVariable( t *lex.Token, val *Value ) *Node {
+  return &Node{ tokenRune: lex.TOKEN_VARIABLE, token: t.Text(), value: val }
+}
+*/
 
 // Invoke the handler of this node
 func (n *Node) Invoke( m *Context ) error {
@@ -67,14 +88,9 @@ func (n *Node) Invoke2( m *Context ) error {
   return n.InvokeRhs(m)
 }
 
-// Token returns this nodes token text
-func (n *Node) Token() string {
+// Token returns this nodes lex.Token
+func (n *Node) Token() *lex.Token {
   return n.token
-}
-
-// Rune returns this nodes rune (optional)
-func (n *Node) Rune() rune {
-  return n.tokenRune
 }
 
 // Value returns this nodes value or nil
@@ -90,6 +106,11 @@ func (n *Node) Left() *Node {
 // Right returns the right hand node or nil
 func (n *Node) Right() *Node {
   return n.left
+}
+
+// Append appends a Node to this nodes list
+func (n *Node) Append( a *Node ) {
+  n.list = append( n.list, a )
 }
 
 // ForEach invokes a function for each node in this nodes list

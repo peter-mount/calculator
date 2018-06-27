@@ -2,14 +2,14 @@ package test
 
 import (
   "fmt"
-  "github.com/peter-mount/calculator/exec"
+  "github.com/peter-mount/calculator/context"
   "testing"
 )
 
 // test v is a null
 func TestValue_NullValue( t *testing.T ) {
-  v := exec.NullValue()
-  if v.Type() != exec.VAR_NULL { t.Error( "Type" ) }
+  v := context.NullValue()
+  if v.Type() != context.VAR_NULL { t.Error( "Type" ) }
   if !v.IsZero()          { t.Error( "IsZero" ) }
   if v.IsNumeric()        { t.Error( "IsNumeric" ) }
   if v.Bool()             { t.Error( "Bool" ) }
@@ -20,9 +20,9 @@ func TestValue_NullValue( t *testing.T ) {
 
 // Test false
 func TestValue_Bool_false( t *testing.T ) {
-  v := exec.BoolValue( false )
+  v := context.BoolValue( false )
 
-  if v.Type() != exec.VAR_BOOL { t.Error( "Type" ) }
+  if v.Type() != context.VAR_BOOL { t.Error( "Type" ) }
   if !v.IsZero()          { t.Error( "IsZero" ) }
   if v.IsNumeric()        { t.Error( "IsNumeric" ) }
   if v.Bool()             { t.Error( "Bool" ) }
@@ -33,9 +33,9 @@ func TestValue_Bool_false( t *testing.T ) {
 
 // Test true
 func TestValue_Bool_true( t *testing.T ) {
-  v := exec.BoolValue( true )
+  v := context.BoolValue( true )
 
-  if v.Type() != exec.VAR_BOOL { t.Error( "Type" ) }
+  if v.Type() != context.VAR_BOOL { t.Error( "Type" ) }
   if v.IsZero()           { t.Error( "IsZero" ) }
   if v.IsNumeric()        { t.Error( "IsNumeric" ) }
   if !v.Bool()            { t.Error( "Bool" ) }
@@ -46,9 +46,9 @@ func TestValue_Bool_true( t *testing.T ) {
 
 // Test int 0
 func TestValue_Int_0( t *testing.T ) {
-  v := exec.IntValue( 0 )
+  v := context.IntValue( 0 )
 
-  if v.Type() != exec.VAR_INT  { t.Error( "Type" ) }
+  if v.Type() != context.VAR_INT  { t.Error( "Type" ) }
   if !v.IsZero()          { t.Error( "IsZero" ) }
   if !v.IsNumeric()       { t.Error( "IsNumeric" ) }
   if v.Bool()             { t.Error( "Bool" ) }
@@ -59,9 +59,9 @@ func TestValue_Int_0( t *testing.T ) {
 
 // Test int 1
 func TestValue_Int_1( t *testing.T ) {
-  v := exec.IntValue( 1 )
+  v := context.IntValue( 1 )
 
-  if v.Type() != exec.VAR_INT  { t.Error( "Type" ) }
+  if v.Type() != context.VAR_INT  { t.Error( "Type" ) }
   if v.IsZero()          { t.Error( "IsZero" ) }
   if !v.IsNumeric()       { t.Error( "IsNumeric" ) }
   if !v.Bool()             { t.Error( "Bool" ) }
@@ -73,7 +73,7 @@ func TestValue_Int_1( t *testing.T ) {
 // Test integers -100 to 100
 func TestValue_Int_pm100( t *testing.T ) {
   for i := -100; i <= 100; i++ {
-    v := exec.IntValue( int64(i) )
+    v := context.IntValue( int64(i) )
 
     if ( i==0 && !v.IsZero() ) || ( i!=0 && v.IsZero() ) { t.Errorf( "IsZero %d", i ) }
     if ( i==0 && v.Bool() ) || ( i!=0 && !v.Bool() ) { t.Errorf( "Bool %d", i ) }
@@ -85,9 +85,9 @@ func TestValue_Int_pm100( t *testing.T ) {
 
 // Test int 0
 func TestValue_Float_0( t *testing.T ) {
-  v := exec.FloatValue( 0 )
+  v := context.FloatValue( 0 )
 
-  if v.Type() != exec.VAR_FLOAT  { t.Error( "Type" ) }
+  if v.Type() != context.VAR_FLOAT  { t.Error( "Type" ) }
   if !v.IsZero()            { t.Error( "IsZero" ) }
   if !v.IsNumeric()         { t.Error( "IsNumeric" ) }
   if v.Bool()               { t.Error( "Bool" ) }
@@ -98,9 +98,9 @@ func TestValue_Float_0( t *testing.T ) {
 
 // Test int 1
 func TestValue_Float_1( t *testing.T ) {
-  v := exec.FloatValue( 1 )
+  v := context.FloatValue( 1 )
 
-  if v.Type() != exec.VAR_FLOAT  { t.Error( "Type" ) }
+  if v.Type() != context.VAR_FLOAT  { t.Error( "Type" ) }
   if v.IsZero()          { t.Error( "IsZero" ) }
   if !v.IsNumeric()       { t.Error( "IsNumeric" ) }
   if !v.Bool()             { t.Error( "Bool" ) }
@@ -112,7 +112,7 @@ func TestValue_Float_1( t *testing.T ) {
 // Test integers -100 to 100
 func TestValue_Float_pm100( t *testing.T ) {
   for i := -100.0; i <= 100.0; i+=0.1 {
-    v := exec.FloatValue( float64(i) )
+    v := context.FloatValue( float64(i) )
 
     if ( i==0 && !v.IsZero() ) || ( i!=0 && v.IsZero() ) { t.Errorf( "IsZero %f", i ) }
     if ( i==0 && v.Bool() ) || ( i!=0 && !v.Bool() ) { t.Errorf( "Bool %f", i ) }

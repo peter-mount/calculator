@@ -1,4 +1,4 @@
-package exec
+package context
 
 import (
   "strconv"
@@ -210,4 +210,20 @@ func (v *Value) String() string {
     default:
       return ""
   }
+}
+
+// OperationType returns the type of the suggested value when performing some
+// operation like addition or multiplication to keep the precision of the result.
+// For example, if a Value is an Integer but the passed value is Float then
+// we should use float.
+func (a *Value) OperationType( b *Value ) int {
+  t  := a.Type();
+  if a.Type() == VAR_STRING || b.Type() == VAR_STRING {
+    t = VAR_STRING
+  } else if a.Type() == VAR_FLOAT || b.Type() == VAR_FLOAT {
+    t = VAR_FLOAT
+  } else if a.Type() == VAR_INT || b.Type() == VAR_INT {
+    t = VAR_INT
+  }
+  return t
 }

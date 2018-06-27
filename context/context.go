@@ -1,4 +1,4 @@
-package exec
+package context
 
 import (
   "errors"
@@ -35,6 +35,10 @@ func (c *Context) Vars() []map[string]*Value {
 // Push a value onto the stack
 func (c *Context) Push( v *Value ) {
   c.stack = append( c.stack, v )
+}
+
+func (c *Context) PushNull() {
+  c.Push( &nullValue )
 }
 
 func (c *Context) PushBool( b bool ) {

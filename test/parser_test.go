@@ -1,6 +1,7 @@
 package test
 
 import (
+  "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/debug"
   "github.com/peter-mount/calculator/exec"
   "testing"
@@ -37,9 +38,6 @@ func TestParser_parse( t *testing.T ) {
 
     for _, e := range testParser_eq {
       parser := calc.Parser()
-      // Uncomment to see debugging
-      //parser.Debug = true
-
       err = parser.Parse( e )
       if err != nil {
         t.Error( err )
@@ -55,21 +53,21 @@ func TestParser_parse( t *testing.T ) {
 }
 
 func TestParser_execute( t *testing.T ) {
-  results := []*exec.Value {
-    exec.IntValue( 3 ),
-    exec.IntValue( 6 ),
-    exec.IntValue( 7 ),
-    exec.IntValue( 9 ),
-    exec.BoolValue( true ),
-    exec.BoolValue( true ),
-    exec.BoolValue( true ),
-    exec.BoolValue( false ),
-    exec.BoolValue( false ),
-    exec.BoolValue( false ),
+  results := []*context.Value {
+    context.IntValue( 3 ),
+    context.IntValue( 6 ),
+    context.IntValue( 7 ),
+    context.IntValue( 9 ),
+    context.BoolValue( true ),
+    context.BoolValue( true ),
+    context.BoolValue( true ),
+    context.BoolValue( false ),
+    context.BoolValue( false ),
+    context.BoolValue( false ),
   }
 
   calc := &exec.Calculator{}
-  ctx := &exec.Context{}
+  ctx := &context.Context{}
 
   for i, eq := range testParser_eq {
 

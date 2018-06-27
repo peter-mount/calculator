@@ -2,6 +2,7 @@ package exec
 
 import (
   "fmt"
+  "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/lex"
   "strconv"
   "text/scanner"
@@ -10,8 +11,8 @@ import (
 type Parser struct {
   calculator   *Calculator
   lexer         lex.Lexer
-  root         *Node
-  funcs         FuncMap
+  root         *context.Node
+  //funcs         FuncMap
   tokenType     rune
   token         string
   precedence    int
@@ -19,11 +20,11 @@ type Parser struct {
 
 func (c *Calculator) Parser() *Parser {
   p := &Parser{ calculator: c }
-  p.funcs = make( FuncMap )
+  //p.funcs = make( FuncMap )
   return p
 }
 
-func (p *Parser) GetRoot() *Node {
+func (p *Parser) GetRoot() *context.Node {
   return p.root
 }
 
@@ -34,6 +35,7 @@ func (p *Parser) Parse( rule string ) error {
   return err
 }
 
+/*
 func (p *Parser) AddFuncs( m *FuncMap ) error {
   for k, f := range *m {
     if _, exists := p.funcs[k]; exists {
@@ -43,19 +45,20 @@ func (p *Parser) AddFuncs( m *FuncMap ) error {
   }
   return nil
 }
+*/
 
-func (p *Parser) parse() (*Node,error) {
+func (p *Parser) parse() (*context.Node,error) {
   n1, err := p.parse_statements()
   return n1, err
 }
 
 // Top level for normal arithmetic
-func (p *Parser) parse_arithmetic() (*Node,error) {
+func (p *Parser) parse_arithmetic() (*context.Node,error) {
   n1, err := p.parse_logic()
   return n1, err
 }
 
-func (p *Parser) parse_parens() (*Node,error) {
+func (p *Parser) parse_parens() (*context.Node,error) {
 
   token := p.lexer.Peek()
   if token.Text() == "(" {
@@ -77,8 +80,8 @@ func (p *Parser) parse_parens() (*Node,error) {
   return expr, err
 }
 
-func (p *Parser) parse_unary() (*Node,error) {
-  var expr *Node
+func (p *Parser) parse_unary() (*context.Node,error) {
+  var expr *context.Node
   var err error
 
   token := p.lexer.Peek()
@@ -101,7 +104,7 @@ func (p *Parser) parse_unary() (*Node,error) {
       if err != nil {
         return nil, err
       }
-      expr = &Node{ token:token.Text(), value: IntValue( iv ) }
+      expr = context.NewConstant( token, context.IntValue( iv ) )
 
     case scanner.Float:
       token = p.lexer.Next()
@@ -109,15 +112,15 @@ func (p *Parser) parse_unary() (*Node,error) {
       if err != nil {
         return nil, err
       }
-      expr = &Node{ token:token.Text(), value: FloatValue( fv )  }
+      expr = context.NewConstant( token, context.FloatValue( fv ) )
 
     case scanner.String:
       token = p.lexer.Next()
-      expr = &Node{ token:token.Text(), value: StringValue( token.Text()[1:len(token.Text())-1] )  }
+      expr = context.NewConstant( token, context.StringValue( token.Text()[1:len(token.Text())-1] ) )
 
     case lex.TOKEN_VARIABLE:
       token = p.lexer.Next()
-      expr = &Node{ tokenRune: lex.TOKEN_VARIABLE, token: token.Text(), handler: getVarHandler }
+      expr = context.NewNode( token, getVarHandler, nil, nil )
 
     default:
       err = fmt.Errorf( "Unknown token: \"%s\"", token.Text() )
