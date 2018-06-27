@@ -13,7 +13,7 @@ func (p *Parser) parse_logic() (*context.Node,error) {
   }
 
   token := p.lexer.Peek()
-  for token.Text() == "==" || token.Text() == "!=" {
+  for token.Text() == "==" || token.Text() == "!=" || token.Text() == "<" || token.Text() == "<=" || token.Text() == ">=" || token.Text() == ">" {
     token = p.lexer.Next()
 
     right, err := p.parse_additive()

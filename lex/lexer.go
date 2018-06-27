@@ -34,7 +34,7 @@ func (t *Token) Clone( s string ) *Token {
 
 // Returns true if a rune should be matched as an ident
 func IsIdent( r rune ) bool {
-  return r=='=' ||
+  return r=='=' || r=='<' || r=='>' ||
     r=='^' || r=='&' ||
     r=='%' || r=='!' ||
     r==':' || r==';'
