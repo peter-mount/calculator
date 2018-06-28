@@ -9,7 +9,7 @@ import (
 
 // parse_math1_handler creates a node for the current token but expects ( ) &
 // some arithmetic providing 1 response
-func (p *Parser) parse_math1_handler( token *lex.Token, handler context.NodeHandler ) (*context.Node,error) {
+func (p *Parser) parse_math1_handler( token *lex.Token, f UnaryFunction ) (*context.Node,error) {
   token = p.lexer.Next()
 
   nextToken := p.lexer.Peek()
@@ -22,7 +22,7 @@ func (p *Parser) parse_math1_handler( token *lex.Token, handler context.NodeHand
     return nil, err
   }
 
-  expr := context.NewNode( token, handler, left, nil )
+  expr, err := OptimizeUnaryFunction( token, left, f )
   return expr, nil
 }
 
@@ -34,96 +34,96 @@ func (p *Parser) parse_math() (*context.Node,error) {
   token := p.lexer.Peek()
   switch token.Text() {
     case "abs":
-      expr, err = p.parse_math1_handler( token, exec.AbsHandler )
+      expr, err = p.parse_math1_handler( token, exec.Abs )
     case "acos":
-      expr, err = p.parse_math1_handler( token, exec.AcosHandler )
+      expr, err = p.parse_math1_handler( token, exec.Acos )
     case "acosh":
-      expr, err = p.parse_math1_handler( token, exec.AcoshHandler )
+      expr, err = p.parse_math1_handler( token, exec.Acosh )
     case "asin":
-      expr, err = p.parse_math1_handler( token, exec.AsinHandler )
+      expr, err = p.parse_math1_handler( token, exec.Asin )
     case "asinh":
-      expr, err = p.parse_math1_handler( token, exec.AsinhHandler )
+      expr, err = p.parse_math1_handler( token, exec.Asinh )
     case "atan":
-      expr, err = p.parse_math1_handler( token, exec.AtanHandler )
+      expr, err = p.parse_math1_handler( token, exec.Atan )
     case "atanh":
-      expr, err = p.parse_math1_handler( token, exec.AtanhHandler )
+      expr, err = p.parse_math1_handler( token, exec.Atanh )
     case "cbrt":
-      expr, err = p.parse_math1_handler( token, exec.CbrtHandler )
+      expr, err = p.parse_math1_handler( token, exec.Cbrt )
     case "ceil":
-      expr, err = p.parse_math1_handler( token, exec.CeilHandler )
+      expr, err = p.parse_math1_handler( token, exec.Ceil )
     case "cos":
-      expr, err = p.parse_math1_handler( token, exec.CosHandler )
+      expr, err = p.parse_math1_handler( token, exec.Cos )
     case "cosh":
-      expr, err = p.parse_math1_handler( token, exec.CoshHandler )
+      expr, err = p.parse_math1_handler( token, exec.Cosh )
 
     case "erf":
-      expr, err = p.parse_math1_handler( token, exec.ErfHandler )
+      expr, err = p.parse_math1_handler( token, exec.Erf )
     case "erfc":
-      expr, err = p.parse_math1_handler( token, exec.ErfcHandler )
+      expr, err = p.parse_math1_handler( token, exec.Erfc )
     case "erfcinv":
-      expr, err = p.parse_math1_handler( token, exec.ErfcinvHandler )
+      expr, err = p.parse_math1_handler( token, exec.Erfcinv )
     case "erfinv":
-      expr, err = p.parse_math1_handler( token, exec.ErfinvHandler )
+      expr, err = p.parse_math1_handler( token, exec.Erfinv )
     case "exp":
-      expr, err = p.parse_math1_handler( token, exec.ExpHandler )
+      expr, err = p.parse_math1_handler( token, exec.Exp )
     case "exp2":
-      expr, err = p.parse_math1_handler( token, exec.Exp2Handler )
+      expr, err = p.parse_math1_handler( token, exec.Exp2 )
     case "expm1":
-      expr, err = p.parse_math1_handler( token, exec.Expm1Handler )
+      expr, err = p.parse_math1_handler( token, exec.Expm1 )
     case "floor":
-      expr, err = p.parse_math1_handler( token, exec.FloorHandler )
+      expr, err = p.parse_math1_handler( token, exec.Floor )
 
     case "gamma":
-      expr, err = p.parse_math1_handler( token, exec.GammaHandler )
+      expr, err = p.parse_math1_handler( token, exec.Gamma )
 
     case "ilogb":
-      expr, err = p.parse_math1_handler( token, exec.IlogbHandler )
+      expr, err = p.parse_math1_handler( token, exec.Ilogb )
     case "isnan":
-      expr, err = p.parse_math1_handler( token, exec.IsNaNHandler )
+      expr, err = p.parse_math1_handler( token, exec.IsNaN )
 
     case "j0":
-      expr, err = p.parse_math1_handler( token, exec.J0Handler )
+      expr, err = p.parse_math1_handler( token, exec.J0 )
     case "j1":
-      expr, err = p.parse_math1_handler( token, exec.J1Handler )
+      expr, err = p.parse_math1_handler( token, exec.J1 )
 
     case "log":
-      expr, err = p.parse_math1_handler( token, exec.LogHandler )
+      expr, err = p.parse_math1_handler( token, exec.Log )
     case "log10":
-      expr, err = p.parse_math1_handler( token, exec.Log10Handler )
+      expr, err = p.parse_math1_handler( token, exec.Log10 )
     case "log1p":
-      expr, err = p.parse_math1_handler( token, exec.Log1pHandler )
+      expr, err = p.parse_math1_handler( token, exec.Log1p )
     case "log2":
-      expr, err = p.parse_math1_handler( token, exec.Log2Handler )
+      expr, err = p.parse_math1_handler( token, exec.Log2 )
     case "logb":
-      expr, err = p.parse_math1_handler( token, exec.LogbHandler )
+      expr, err = p.parse_math1_handler( token, exec.Logb )
 
     case "pow10":
-      expr, err = p.parse_math1_handler( token, exec.Pow10Handler )
+      expr, err = p.parse_math1_handler( token, exec.Pow10 )
 
     case "round":
-      expr, err = p.parse_math1_handler( token, exec.RoundHandler )
+      expr, err = p.parse_math1_handler( token, exec.Round )
 
     case "roundtoeven":
-      expr, err = p.parse_math1_handler( token, exec.Round2evenHandler )
+      expr, err = p.parse_math1_handler( token, exec.Round2even )
 
     case "sin":
-      expr, err = p.parse_math1_handler( token, exec.SinHandler )
+      expr, err = p.parse_math1_handler( token, exec.Sin )
     case "sinh":
-      expr, err = p.parse_math1_handler( token, exec.SinhHandler )
+      expr, err = p.parse_math1_handler( token, exec.Sinh )
     case "sqrt":
-      expr, err = p.parse_math1_handler( token, exec.SqrtHandler )
+      expr, err = p.parse_math1_handler( token, exec.Sqrt )
 
     case "tan":
-      expr, err = p.parse_math1_handler( token, exec.TanHandler )
+      expr, err = p.parse_math1_handler( token, exec.Tan )
     case "tanh":
-      expr, err = p.parse_math1_handler( token, exec.TanhHandler )
+      expr, err = p.parse_math1_handler( token, exec.Tanh )
     case "trunc":
-      expr, err = p.parse_math1_handler( token, exec.TruncHandler )
+      expr, err = p.parse_math1_handler( token, exec.Trunc )
 
     case "y0":
-      expr, err = p.parse_math1_handler( token, exec.Y0Handler )
+      expr, err = p.parse_math1_handler( token, exec.Y0 )
     case "y1":
-      expr, err = p.parse_math1_handler( token, exec.Y1Handler )
+      expr, err = p.parse_math1_handler( token, exec.Y1 )
 
     default:
       expr, err = p.parse_constants()

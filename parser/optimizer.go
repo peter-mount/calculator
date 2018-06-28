@@ -1,12 +1,56 @@
 package parser
 
 import (
+  "errors"
   "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/lex"
 )
 
+// Function that performs an operation on one Value
+type UnaryFunction func(*context.Value)(*context.Value,error)
+
 // Function that performs an operation on two Values
 type BinaryFunction func(*context.Value,*context.Value)(*context.Value,error)
+
+// OptimizeOperation will if both left and right nodes are constants return
+// a constant node with the result of some function.
+// If either are not constant then a new node will be created with the supplied handler
+// attached.
+func OptimizeUnaryFunction( token *lex.Token, left *context.Node, f UnaryFunction ) (*context.Node,error) {
+  if left != nil && left.IsConstant() {
+    c, err := f( left.Value() )
+    if err != nil {
+      return nil, err
+    }
+    return context.NewConstant( token, c ), nil
+  } else {
+    return context.NewNode(
+      token,
+      func( m *context.Context, n *context.Node ) error {
+        err := n.InvokeLhs(m)
+        if err != nil {
+          return err
+        }
+
+        a, err := m.Pop()
+        if err != nil {
+          return err
+        }
+
+        if !a.IsNumeric() {
+          return errors.New( "Unsupported type" )
+        }
+
+        c, err := f( a )
+        if err == nil {
+          m.Push( c )
+        }
+        return err
+      },
+      left,
+      nil ), nil
+  }
+}
 
 // OptimizeOperation will if both left and right nodes are constants return
 // a constant node with the result of some function.
