@@ -24,12 +24,12 @@ func (p *Parser) parse_additive() (*context.Node,error) {
 
     switch token.Text() {
       case "+":
-        expr, err = OptimizeOperation( token, expr, right, exec.Add )
+        expr, err = OptimizeBinaryFunction( token, expr, right, exec.Add )
         if err != nil {
           return nil, err
         }
       case "-":
-        expr, err = OptimizeOperation( token, expr, right, exec.Sub )
+        expr, err = OptimizeBinaryFunction( token, expr, right, exec.Sub )
         if err != nil {
           return nil, err
         }
@@ -59,13 +59,13 @@ func (p *Parser) parse_multiplicative() (*context.Node,error) {
 
     switch token.Text() {
       case "*":
-        expr, err = OptimizeOperation( token, expr, right, exec.Mult )
+        expr, err = OptimizeBinaryFunction( token, expr, right, exec.Mult )
         if err != nil {
           return nil, err
         }
 
       case "/":
-        expr, err = OptimizeOperation( token, expr, right, exec.Div )
+        expr, err = OptimizeBinaryFunction( token, expr, right, exec.Div )
     }
 
     token = p.lexer.Peek()

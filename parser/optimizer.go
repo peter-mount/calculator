@@ -12,9 +12,9 @@ type UnaryFunction func(*context.Value)(*context.Value,error)
 // Function that performs an operation on two Values
 type BinaryFunction func(*context.Value,*context.Value)(*context.Value,error)
 
-// OptimizeOperation will if both left and right nodes are constants return
+// OptimizeUnaryFunction will if the left node is a constant return
 // a constant node with the result of some function.
-// If either are not constant then a new node will be created with the supplied handler
+// If it isn't a constant then a new node will be created with the supplied handler
 // attached.
 func OptimizeUnaryFunction( token *lex.Token, left *context.Node, f UnaryFunction ) (*context.Node,error) {
   if left != nil && left.IsConstant() {
@@ -52,11 +52,11 @@ func OptimizeUnaryFunction( token *lex.Token, left *context.Node, f UnaryFunctio
   }
 }
 
-// OptimizeOperation will if both left and right nodes are constants return
+// OptimizeBinaryFunction will if both left and right nodes are constants return
 // a constant node with the result of some function.
 // If either are not constant then a new node will be created with the supplied handler
 // attached.
-func OptimizeOperation( token *lex.Token, left *context.Node, right *context.Node, f BinaryFunction ) (*context.Node,error) {
+func OptimizeBinaryFunction( token *lex.Token, left *context.Node, right *context.Node, f BinaryFunction ) (*context.Node,error) {
   if left != nil && right != nil && left.IsConstant() && right.IsConstant() {
     c, err := f( left.Value(), right.Value() )
     if err != nil {
