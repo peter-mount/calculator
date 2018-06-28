@@ -15,7 +15,7 @@ func main() {
   calc := &calculator.Calculator{}
 
   for _, arg := range flag.Args() {
-    errorExit( calc.Parse( arg ) )
+    errorExit( calc.ParseScriptString( arg ) )
 
     ctx := &context.Context{}
     errorExit( calc.Execute( ctx ) )

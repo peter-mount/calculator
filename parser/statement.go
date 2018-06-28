@@ -64,7 +64,7 @@ func (p *Parser) parse_statement() (*context.Node,error) {
     token = p.lexer.Skip()
   }
 
-  expr, err := p.parse_arithmetic()
+  expr, err := p.ParseExpression()
   if err != nil {
     return nil, err
   }
@@ -73,7 +73,7 @@ func (p *Parser) parse_statement() (*context.Node,error) {
   for token.Text() == "=" && expr != nil && expr.Token().Token() == lex.TOKEN_VARIABLE {
     token = p.lexer.Next()
 
-    left, err := p.parse_arithmetic()
+    left, err := p.ParseExpression()
     if err != nil {
       return nil, err
     }

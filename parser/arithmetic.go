@@ -83,7 +83,7 @@ func (p *Parser) parse_negative() (*context.Node,error) {
 
     // Future: If we want "--" operator put test here
 
-    expr, err := p.parse_arithmetic()
+    expr, err := p.ParseExpression()
     if err != nil {
       return nil, err
     }

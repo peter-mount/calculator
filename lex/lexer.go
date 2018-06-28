@@ -1,7 +1,7 @@
 package lex
 
 import (
-  "strings"
+  "io"
   "text/scanner"
 )
 
@@ -74,8 +74,8 @@ func (l *Lexer) scanWhile(f func(rune)bool) string {
   return s
 }
 
-func (l *Lexer) Parse( rule string ) {
-  l.scanner.Init( strings.NewReader( rule ) )
+func (l *Lexer) Parse( r io.Reader ) {
+  l.scanner.Init( r )
 
   var token *Token
   for token == nil || token.token != scanner.EOF {

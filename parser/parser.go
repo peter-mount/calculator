@@ -29,7 +29,7 @@ func (p *Parser) ParseStatements() (*context.Node,error) {
 }
 
 // Top level for normal arithmetic
-func (p *Parser) parse_arithmetic() (*context.Node,error) {
+func (p *Parser) ParseExpression() (*context.Node,error) {
   n1, err := p.parse_logic()
   return n1, err
 }
@@ -40,7 +40,7 @@ func (p *Parser) parse_parens() (*context.Node,error) {
   if token.Text() == "(" {
     p.lexer.Next()
 
-    expr, err := p.parse_arithmetic()
+    expr, err := p.ParseExpression()
     if err != nil {
       return nil, err
     }

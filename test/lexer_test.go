@@ -2,6 +2,7 @@ package test
 
 import (
   "github.com/peter-mount/calculator/lex"
+  "strings"
   "testing"
 )
 
@@ -11,7 +12,7 @@ func TestLexer( t *testing.T ) {
   lex := &lex.Lexer{}
 
   expected := []string{ "1","2","3","+","-","10","3.14159","(","2","*","2",")","+","(","3","*","3",")" }
-  lex.Parse( "1 2 3 + - 10 3.14159 (2*2)+(3*3)")
+  lex.Parse( strings.NewReader( "1 2 3 + - 10 3.14159 (2*2)+(3*3)" ) )
 
   for i, s := range expected {
     token := lex.Peek()

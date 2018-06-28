@@ -48,7 +48,7 @@ func TestParser_parse( t *testing.T ) {
     calc := &calculator.Calculator{}
 
     for _, e := range testParser_eq {
-      err = calc.Parse( e )
+      err = calc.ParseScriptString( e )
       if err != nil {
         t.Error( err )
       } else if calc.GetRoot() == nil {
@@ -86,7 +86,7 @@ func TestParser_execute( t *testing.T ) {
 
   for _, eq := range testParser_eq {
 
-    err := calc.Parse( eq )
+    err := calc.ParseScriptString( eq )
     if err != nil {
       t.Error( err )
     }

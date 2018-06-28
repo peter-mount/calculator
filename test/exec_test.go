@@ -11,7 +11,7 @@ func TestExec( t *testing.T ) {
 
   calc := &calculator.Calculator{}
 
-  err := calc.Parse( "1 + 1" )
+  err := calc.ParseScriptString( "1 + 1" )
   if err != nil {
     t.Error( err )
   }
