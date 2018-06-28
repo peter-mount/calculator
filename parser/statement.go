@@ -60,16 +60,36 @@ func (p *Parser) parse_statement() (*context.Node,error) {
     token = p.lexer.Next()
     return nil, nil
   }
+
   for token.Text() == ";" {
     token = p.lexer.Skip()
   }
+
+  var expr *context.Node
+  var err error
+  switch token.Text() {
+    case "if":
+      expr, err = p.parse_if()
+
+    default:
+      // Pass to setvar which will pass on to ParseExpression
+      expr, err = p.parse_setvar()
+  }
+
+  if err != nil {
+    return nil, err
+  }
+  return expr, nil
+}
+
+func (p *Parser) parse_setvar() (*context.Node,error) {
 
   expr, err := p.ParseExpression()
   if err != nil {
     return nil, err
   }
 
-  token = p.lexer.Peek()
+  token := p.lexer.Peek()
   for token.Text() == "=" && expr != nil && expr.Token().Token() == lex.TOKEN_VARIABLE {
     token = p.lexer.Next()
 
