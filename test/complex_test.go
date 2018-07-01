@@ -1,9 +1,7 @@
 package test
 
 import (
-  "fmt"
   "github.com/peter-mount/calculator/calculator"
-  "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/debug"
   "io"
   "os"
@@ -18,11 +16,11 @@ var testParser_complex []string = []string{
   "(1 + 1i) * (1 + 1i)",
   "(1 + 1i) / (1 + 1i)",
   "(1 + 1i) == (1 + 1i)",
+  "(1 + $a i) + (2 + 1i)",
 }
 
 // Test basic math precedence
 func TestComplex( t *testing.T ) {
-
 
   f, err := os.OpenFile( "/tmp/complex.html", os.O_CREATE | os.O_TRUNC|os.O_WRONLY, 0666 )
   if err != nil {
@@ -32,10 +30,6 @@ func TestComplex( t *testing.T ) {
   defer f.Close()
 
   debug.HtmlTreeStart( f )
-
-  c := complex( 1, 2 )
-  vc := context.ComplexValue( c )
-  f.WriteString( fmt.Sprintf( "<p>Complex %v %v %s</p>", c, vc.Complex(), vc.String() ) )
 
   calc := &calculator.Calculator{}
 

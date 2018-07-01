@@ -121,3 +121,58 @@ func TestValue_Float_pm100( t *testing.T ) {
     if v.String() != fmt.Sprintf("%.10f",i) { t.Errorf( "String %f \"%s\"", i, v.String() ) }
   }
 }
+
+func Test_Value_Complex( t *testing.T ) {
+  c := complex( 1, 2 )
+  vc := context.ComplexValue( c )
+  if vc.Type() != context.VAR_COMPLEX {
+    t.Error( "Wrong type")
+  }
+  if vc.IsNumeric() {
+    t.Error( "Is numeric")
+  }
+  if !vc.IsComplex() {
+    t.Error( "Not complex")
+  }
+  if vc.Complex() != c {
+    t.Error( "Wrong complex value")
+  }
+  if vc.Real() != 1 {
+    t.Error( "Wrong real value")
+  }
+  if vc.Imaginary() != 2 {
+    t.Error( "Wrong imaginary value")
+  }
+}
+
+func Test_Value_Complex_0( t *testing.T ) {
+  c := complex( 0, 0 )
+  vc := context.ComplexValue( c )
+  if !vc.IsZero() {
+    t.Error( "Not zero")
+  }
+}
+
+func Test_Value_Complex_0_1i( t *testing.T ) {
+  c := complex( 0, 1 )
+  vc := context.ComplexValue( c )
+  if vc.IsZero() {
+    t.Error( "Is zero")
+  }
+}
+
+func Test_Value_Complex_1_0i( t *testing.T ) {
+  c := complex( 1, 0 )
+  vc := context.ComplexValue( c )
+  if vc.IsZero() {
+    t.Error( "Is zero")
+  }
+}
+
+func Test_Value_Complex_1_1i( t *testing.T ) {
+  c := complex( 1, 1 )
+  vc := context.ComplexValue( c )
+  if vc.IsZero() {
+    t.Error( "Is zero")
+  }
+}
