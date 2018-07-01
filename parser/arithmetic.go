@@ -113,6 +113,6 @@ func (p *Parser) parse_negative() (*context.Node,error) {
     // Future: If we want "++" operator put test here
   }
 
-  expr, err := p.parse_parens()
+  expr, err := p.parse_complex()
   return expr, err
 }

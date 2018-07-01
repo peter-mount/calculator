@@ -19,6 +19,17 @@ type Token struct {
   text    string
 }
 
+//
+const (
+  EOF = scanner.EOF
+  Ident = scanner.Ident
+  Int = scanner.Int
+  Float = scanner.Float
+  Char = scanner.Char
+  String = scanner.String
+  RawString = scanner.RawString
+  Comment = scanner.Comment
+)
 const (
   TOKEN_VARIABLE = -(iota+100)
 )
@@ -78,10 +89,10 @@ func (l *Lexer) Parse( r io.Reader ) {
   l.scanner.Init( r )
 
   var token *Token
-  for token == nil || token.token != scanner.EOF {
+  for token == nil || token.token != EOF {
     token = l.scan()
 
-    if token.token != scanner.EOF {
+    if token.token != EOF {
       token.text = l.scanner.TokenText()
 
       // Treat chars as an ident

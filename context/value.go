@@ -1,6 +1,7 @@
 package context
 
 import (
+  "fmt"
   "strconv"
 )
 
@@ -12,6 +13,7 @@ const (
   VAR_BOOL
   VAR_INT
   VAR_FLOAT
+  VAR_COMPLEX
   VAR_STRING
 )
 
@@ -21,6 +23,7 @@ type Value struct {
   boolVal    bool
   intVal     int64
   floatVal   float64
+  complexVal complex128
   stringVal  string
 }
 
@@ -41,6 +44,7 @@ func (a *Value) Same( b *Value ) bool {
          a.boolVal == b.boolVal &&
          a.intVal == b.intVal &&
          a.floatVal == b.floatVal &&
+         a.complexVal == b.complexVal &&
          a.stringVal == b.stringVal
 }
 
@@ -52,6 +56,8 @@ func (a *Value) Equal( b *Value ) bool {
       return a.Int() == b.Int()
     case VAR_FLOAT:
       return a.Float() == b.Float()
+    case VAR_COMPLEX:
+      return a.Complex() == b.Complex()
     case VAR_STRING:
       return a.String() == b.String()
     default:
@@ -87,6 +93,12 @@ func FloatValue( i float64 ) *Value {
   return &Value{ varType: VAR_FLOAT, floatVal: i }
 }
 
+
+// ComplexValue returns a Value for a complex128
+func ComplexValue( i complex128 ) *Value {
+  return &Value{ varType: VAR_COMPLEX, complexVal: i }
+}
+
 // StringValue returns a Value for an string
 func StringValue( i string ) *Value {
   return &Value{ varType: VAR_STRING, stringVal: i }
@@ -108,6 +120,8 @@ func (v *Value) IsZero() bool {
       return v.intVal == 0
     case VAR_FLOAT:
       return v.floatVal == 0.0
+    case VAR_COMPLEX:
+      return v.complexVal == 0 + 0i
     case VAR_STRING:
       return v.stringVal == ""
     default:
@@ -118,6 +132,10 @@ func (v *Value) IsZero() bool {
 // IsNumeric returns true if the Value is a number, i.e. int64 or float64
 func (v *Value) IsNumeric() bool {
   return v.varType == VAR_INT || v.varType == VAR_FLOAT
+}
+
+func (v *Value) IsComplex() bool {
+  return v.varType == VAR_COMPLEX
 }
 
 // Bool returns the value as a bool
@@ -132,6 +150,11 @@ func (v *Value) Bool() bool {
       return true
     case VAR_FLOAT:
       if v.floatVal == 0 {
+        return false
+      }
+      return true
+    case VAR_COMPLEX:
+      if v.complexVal == 0 + 0i {
         return false
       }
       return true
@@ -157,6 +180,8 @@ func (v *Value) Int() int64 {
       return v.intVal
     case VAR_FLOAT:
       return int64(v.floatVal)
+    case VAR_COMPLEX:
+      return int64(real(v.complexVal))
     case VAR_STRING:
       r, err := strconv.ParseInt( v.stringVal, 10, 64 )
       if err == nil {
@@ -181,6 +206,8 @@ func (v *Value) Float() float64 {
       return float64(v.intVal)
     case VAR_FLOAT:
       return v.floatVal
+    case VAR_COMPLEX:
+      return real(v.complexVal)
     case VAR_STRING:
       r, err := strconv.ParseFloat( v.stringVal, 64 )
       if err == nil {
@@ -191,6 +218,35 @@ func (v *Value) Float() float64 {
     default:
       return 0.0
   }
+}
+
+// Return the number as a Complex number.
+// For real numbers this will return the complex value with 0 for the imaginary component.
+func (v *Value) Complex() complex128 {
+  if v.varType == VAR_COMPLEX {
+    return v.complexVal
+  }
+  return complex( v.Float(), 0 )
+}
+
+// Real returns the real value of this Value.
+// For real numbers this is the same as Float() but for complex numbers this
+// returns the real component.
+func (v *Value) Real() float64 {
+  if v.varType == VAR_COMPLEX {
+    return real(v.complexVal)
+  }
+  return v.Float()
+}
+
+// Imaginary returns the imaginary value of this Value.
+// For real numbers this returns 0.0 but for complex numbers this returns the
+// imaginary component.
+func (v *Value) Imaginary() float64 {
+  if v.varType == VAR_COMPLEX {
+    return imag(v.complexVal)
+  }
+  return 0.0
 }
 
 // String returns the value as a string
@@ -205,6 +261,8 @@ func (v *Value) String() string {
       return strconv.FormatInt( v.intVal, 10 )
     case VAR_FLOAT:
       return strconv.FormatFloat( v.floatVal, 'f', 10, 64 )
+    case VAR_COMPLEX:
+      return fmt.Sprintf("%v",v.complexVal)
     case VAR_STRING:
       return v.stringVal
     default:
@@ -220,6 +278,8 @@ func (a *Value) OperationType( b *Value ) int {
   t  := a.Type();
   if a.Type() == VAR_STRING || b.Type() == VAR_STRING {
     t = VAR_STRING
+  } else if a.Type() == VAR_COMPLEX || b.Type() == VAR_COMPLEX {
+    t = VAR_COMPLEX
   } else if a.Type() == VAR_FLOAT || b.Type() == VAR_FLOAT {
     t = VAR_FLOAT
   } else if a.Type() == VAR_INT || b.Type() == VAR_INT {

@@ -47,6 +47,8 @@ func Add( a *context.Value, b *context.Value ) (*context.Value,error) {
         return context.FloatValue( a.Float() + b.Float() ), nil
       case context.VAR_STRING:
         return context.StringValue( a.String() + b.String() ), nil
+      case context.VAR_COMPLEX:
+        return context.ComplexValue( a.Complex() + b.Complex() ), nil
     }
   }
 
@@ -66,6 +68,8 @@ func Sub( a *context.Value, b *context.Value ) (*context.Value,error) {
         return context.IntValue( a.Int() - b.Int() ), nil
       case context.VAR_FLOAT:
         return context.FloatValue( a.Float() - b.Float() ), nil
+      case context.VAR_COMPLEX:
+        return context.ComplexValue( a.Complex() - b.Complex() ), nil
       default:
     }
   }
@@ -86,7 +90,9 @@ func Mult( a *context.Value, b *context.Value ) (*context.Value,error) {
         return context.IntValue( a.Int() * b.Int() ), nil
       case context.VAR_FLOAT:
         return context.FloatValue( a.Float() * b.Float() ), nil
-      }
+      case context.VAR_COMPLEX:
+        return context.ComplexValue( a.Complex() * b.Complex() ), nil
+    }
   }
   return nil, errors.New( "Unsupported type for mult" )
 }
@@ -109,6 +115,8 @@ func Div( a *context.Value, b *context.Value ) (*context.Value,error) {
         return context.FloatValue( a.Float() / b.Float() ), nil
       case context.VAR_FLOAT:
         return context.FloatValue( a.Float() / b.Float() ), nil
+      case context.VAR_COMPLEX:
+        return context.ComplexValue( a.Complex() / b.Complex() ), nil
     }
   }
 
