@@ -42,9 +42,13 @@ func (p *Parser) parse_statement_block() (*context.Node,error) {
       }
       token = p.lexer.Peek()
     }
+
     if token.Text() != "}" {
       return nil, fmt.Errorf( "Expecting }" )
     }
+
+    // Skip the }
+    p.lexer.Next()
     return block, nil
   }
 
