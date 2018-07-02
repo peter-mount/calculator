@@ -1,7 +1,6 @@
 package parser
 
 import (
-  "errors"
   "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/exec"
 )
@@ -90,17 +89,11 @@ func (p *Parser) parse_negative() (*context.Node,error) {
 
     // If expr is a value then we can just negate it now
     if expr.Value() != nil {
-      value := expr.Value()
-      switch value.Type() {
-        case context.VAR_BOOL:
-          value = context.BoolValue( !value.Bool() )
-        case context.VAR_INT:
-          value = context.IntValue( -value.Int() )
-        case context.VAR_FLOAT:
-          value = context.FloatValue( -value.Float() )
-        default:
-          return nil, errors.New( "Unsupported type for neg" )
+      value, err := exec.Neg( expr.Value() )
+      if err != nil {
+        return nil, err
       }
+
       return context.NewConstant( token, value), nil
     }
 

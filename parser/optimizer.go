@@ -1,7 +1,6 @@
 package parser
 
 import (
-  "errors"
   "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/lex"
 )
@@ -35,10 +34,6 @@ func OptimizeUnaryFunction( token *lex.Token, left *context.Node, f UnaryFunctio
         a, err := m.Pop()
         if err != nil {
           return err
-        }
-
-        if !a.IsNumeric() {
-          return errors.New( "Unsupported type" )
         }
 
         c, err := f( a )

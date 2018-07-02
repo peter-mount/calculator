@@ -23,6 +23,10 @@ func (p *Parser) parse_math1_handler( token *lex.Token, f UnaryFunction ) (*cont
   }
 
   expr, err := OptimizeUnaryFunction( token, left, f )
+  if err != nil {
+    return nil, err
+  }
+
   return expr, nil
 }
 
@@ -51,10 +55,14 @@ func (p *Parser) parse_math() (*context.Node,error) {
       expr, err = p.parse_math1_handler( token, exec.Cbrt )
     case "ceil":
       expr, err = p.parse_math1_handler( token, exec.Ceil )
+    case "conj":
+      expr, err = p.parse_math1_handler( token, exec.Conj )
     case "cos":
       expr, err = p.parse_math1_handler( token, exec.Cos )
     case "cosh":
       expr, err = p.parse_math1_handler( token, exec.Cosh )
+    case "cot":
+      expr, err = p.parse_math1_handler( token, exec.Cot )
 
     case "erf":
       expr, err = p.parse_math1_handler( token, exec.Erf )
@@ -78,6 +86,8 @@ func (p *Parser) parse_math() (*context.Node,error) {
 
     case "ilogb":
       expr, err = p.parse_math1_handler( token, exec.Ilogb )
+    case "imag":
+      expr, err = p.parse_math1_handler( token, exec.Imag )
     case "isnan":
       expr, err = p.parse_math1_handler( token, exec.IsNaN )
 
@@ -100,9 +110,10 @@ func (p *Parser) parse_math() (*context.Node,error) {
     case "pow10":
       expr, err = p.parse_math1_handler( token, exec.Pow10 )
 
+    case "real":
+      expr, err = p.parse_math1_handler( token, exec.Real )
     case "round":
       expr, err = p.parse_math1_handler( token, exec.Round )
-
     case "roundtoeven":
       expr, err = p.parse_math1_handler( token, exec.Round2even )
 

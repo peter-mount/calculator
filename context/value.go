@@ -138,6 +138,17 @@ func (v *Value) IsComplex() bool {
   return v.varType == VAR_COMPLEX
 }
 
+func (v *Value) IsNegative() bool {
+  switch v.varType {
+    case VAR_INT:
+      return v.intVal < 0
+    case VAR_FLOAT:
+      return v.floatVal < 0.0
+    default:
+      return false
+  }
+}
+
 // Bool returns the value as a bool
 func (v *Value) Bool() bool {
   switch v.varType {

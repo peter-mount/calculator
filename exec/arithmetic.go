@@ -17,18 +17,28 @@ func NegHandler( m *context.Context, n *context.Node ) error {
     return err
   }
 
-  switch a.Type() {
-    case context.VAR_BOOL:
-      m.PushBool( !a.Bool() )
-    case context.VAR_INT:
-      m.PushInt( -a.Int() )
-    case context.VAR_FLOAT:
-      m.PushFloat( -a.Float() )
-    default:
-      return errors.New( "Unsupported type for neg" )
+  c, err := Neg( a )
+  if err != nil {
+    return err
   }
 
+  m.Push( c )
   return nil
+}
+
+func Neg( a *context.Value ) (*context.Value,error) {
+  switch a.Type() {
+    case context.VAR_BOOL:
+      return context.BoolValue( !a.Bool() ), nil
+    case context.VAR_INT:
+      return context.IntValue( -a.Int() ), nil
+    case context.VAR_FLOAT:
+      return context.FloatValue( -a.Float() ), nil
+    case context.VAR_COMPLEX:
+      return context.ComplexValue( -a.Complex() ), nil
+    default:
+      return nil, errors.New( "Unsupported type for neg" )
+  }
 }
 
 // Addition of 2 values.

@@ -45,6 +45,10 @@ func (c *Context) PushBool( b bool ) {
   c.Push( BoolValue( b ) )
 }
 
+func (c *Context) PushComplex( x complex128 ) {
+  c.Push( ComplexValue( x ) )
+}
+
 func (c *Context) PushInt( i int64 ) {
   c.Push( IntValue( i ) )
 }
