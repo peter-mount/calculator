@@ -55,3 +55,28 @@ func TestIfElse( t *testing.T ) {
     t.Errorf( "Expected 2 got %v", a )
   }
 }
+
+func TestWhile( t *testing.T ) {
+
+  calc := &calculator.Calculator{}
+
+  e := "$a=0;while( $a < 10 ) { $a = $a + 1 }"
+
+  err := calc.ParseScriptString( e )
+  if err != nil {
+    t.Error( err )
+  }
+
+  ctx := &context.Context{}
+  err = calc.Execute( ctx )
+  if err != nil {
+    t.Error( err )
+  }
+
+  a := ctx.GetVar( "a" )
+  if a == nil {
+    t.Error( "No output" )
+  } else if !a.IsNumeric() || a.Int() != 10 {
+    t.Errorf( "Expected 10 got %v", a )
+  }
+}
