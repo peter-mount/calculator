@@ -66,6 +66,40 @@ func DoUntilHandler( m *context.Context, n *context.Node ) error {
   return doLoop( m, n, false, loopFalse )
 }
 
+func ForHandler( m *context.Context, n *context.Node ) error {
+  m.StartScope()
+  defer m.EndScope()
+
+  err := n.InvokeLhs( m )
+  if err != nil {
+    return err
+  }
+
+  cond, err := evalCondition( m, n.Center() )
+  if err != nil {
+    return err
+  }
+
+  for cond {
+    err = InvokeAllHandler( m, n )
+    if err != nil {
+      return err
+    }
+
+    err = n.InvokeRhs( m )
+    if err != nil {
+      return err
+    }
+
+    cond, err = evalCondition( m, n.Center() )
+    if err != nil {
+      return err
+    }
+  }
+
+  return nil
+}
+
 func IfHandler( m *context.Context, n *context.Node ) error {
   cond, err := evalCondition( m, n.Left() )
   if err != nil {

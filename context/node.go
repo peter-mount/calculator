@@ -22,6 +22,8 @@ type Node struct {
   token      *lex.Token
   // left hand side
   left       *Node
+  // The center, rarely used, e.g. for
+  center     *Node
   // right hand side
   right      *Node
   // handler for this node
@@ -36,6 +38,10 @@ var blockToken = &lex.Token{}
 
 func NewNode( t *lex.Token, f NodeHandler, left *Node, right *Node ) *Node {
   return &Node{ token: t, handler: f, left: left, right: right }
+}
+
+func NewNode3( t *lex.Token, f NodeHandler, left *Node, center *Node, right *Node ) *Node {
+  return &Node{ token: t, handler: f, left: left, center: center, right: right }
 }
 
 func NewConstant( t *lex.Token, val *Value ) *Node {
@@ -66,6 +72,14 @@ func (n *Node) Invoke( m *Context ) error {
 func (n *Node) InvokeLhs( m *Context ) error {
   if n.left != nil {
     return n.left.Invoke(m)
+  }
+  return nil
+}
+
+// Invokes the center node or returns false if none
+func (n *Node) InvokeCenter( m *Context ) error {
+  if n.center != nil {
+    return n.center.Invoke(m)
   }
   return nil
 }
@@ -109,13 +123,19 @@ func (n *Node) Left() *Node {
 }
 
 // Right returns the right hand node or nil
+func (n *Node) Center() *Node {
+  return n.center
+}
+
+// Right returns the right hand node or nil
 func (n *Node) Right() *Node {
   return n.left
 }
 
 // Append appends a Node to this nodes list
-func (n *Node) Append( a *Node ) {
+func (n *Node) Append( a *Node ) *Node {
   n.list = append( n.list, a )
+  return n
 }
 
 // ForEach invokes a function for each node in this nodes list

@@ -56,6 +56,31 @@ func TestDoWhile( t *testing.T ) {
   }
 }
 
+func TestFor( t *testing.T ) {
+
+  calc := &calculator.Calculator{}
+
+  e := "$a=-1;for($i=0; $i <= 10; $i = $i + 1) { $a = $i }"
+
+  err := calc.ParseScriptString( e )
+  if err != nil {
+    t.Error( err )
+  }
+
+  ctx := &context.Context{}
+  err = calc.Execute( ctx )
+  if err != nil {
+    t.Error( err )
+  }
+
+  a := ctx.GetVar( "a" )
+  if a == nil {
+    t.Error( "No output" )
+  } else if !a.IsNumeric() || a.Int() != 10 {
+    t.Errorf( "Expected 10 got %v", a )
+  }
+}
+
 func TestIf( t *testing.T ) {
 
   calc := &calculator.Calculator{}

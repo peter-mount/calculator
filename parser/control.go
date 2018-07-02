@@ -74,6 +74,57 @@ func (p *Parser) parse_do() (*context.Node,error) {
   }
 }
 
+// for init; condition; increment {...}
+func (p *Parser) parse_for() (*context.Node,error) {
+  token := p.lexer.Next()
+
+  err :=p.lexer.Expect( "(" )
+  if err != nil {
+    return nil, err
+  }
+
+  // The initial statement
+  init, err := p.parse_statement()
+  if err != nil {
+    return nil, err
+  }
+
+  err =p.lexer.Expect( ";" )
+  if err != nil {
+    return nil, err
+  }
+
+  // The condition
+  cond, err := p.ParseExpression()
+  if err != nil {
+    return nil, err
+  }
+
+  err =p.lexer.Expect( ";" )
+  if err != nil {
+    return nil, err
+  }
+
+  // The incremdent statement
+  incr, err := p.parse_statement()
+  if err != nil {
+    return nil, err
+  }
+
+  err =p.lexer.Expect( ")" )
+  if err != nil {
+    return nil, err
+  }
+
+  // The statements block
+  statements, err := p.parse_statement_block()
+  if err != nil {
+    return nil, err
+  }
+
+  return context.NewNode3( token, exec.ForHandler, init, cond, incr ).Append( statements ), nil
+}
+
 // while( expression ) { statement }
 // until( expression ) { statement }
 // h is the actual NodeHandler to implement this

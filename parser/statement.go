@@ -78,6 +78,9 @@ func (p *Parser) parse_statement() (*context.Node,error) {
     case "do":
       expr, err = p.parse_do()
 
+    case "for":
+      expr, err = p.parse_for()
+
     case "until":
       expr, err = p.parse_condLoop( exec.UntilHandler )
 

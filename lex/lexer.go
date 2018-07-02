@@ -1,6 +1,7 @@
 package lex
 
 import (
+  "fmt"
   "io"
   "text/scanner"
 )
@@ -133,6 +134,15 @@ func (l *Lexer) Peek() *Token {
 func (l *Lexer) Skip() *Token {
   l.Next()
   return l.Peek()
+}
+
+// Expect will return an error if the next token is not that expected
+func (l *Lexer) Expect( expected string ) error {
+  token := l.Next()
+  if token.text != expected {
+    return fmt.Errorf( "Expected \"%s\" got \"%s\"", expected, token.text )
+  }
+  return nil
 }
 
 // Token returns the rune for this token
