@@ -1,6 +1,7 @@
 package parser
 
 import (
+  "fmt"
   "github.com/peter-mount/calculator/context"
   "github.com/peter-mount/calculator/exec"
 )
@@ -41,12 +42,46 @@ func (p *Parser) parse_if() (*context.Node,error) {
   return expr, nil
 }
 
+// do { statement } while expression
+// do { statement } until expression
+func (p *Parser) parse_do() (*context.Node,error) {
+  token := p.lexer.Next()
+
+  // The statements block
+  right, err := p.parse_statement_block()
+  if err != nil {
+    return nil, err
+  }
+
+  token = p.lexer.Peek()
+  switch token.Text() {
+    case "while":
+      token = p.lexer.Next()
+      left, err := p.ParseExpression()
+      if err != nil {
+        return nil, err
+      }
+      return context.NewNode( token, exec.DoWhileHandler, left, right ), nil
+    case "until":
+      token = p.lexer.Next()
+      left, err := p.ParseExpression()
+      if err != nil {
+        return nil, err
+      }
+      return context.NewNode( token, exec.DoUntilHandler, left, right ), nil
+    default:
+      return nil, fmt.Errorf( "Expected while or until, got: \"%s\"", token.Text() )
+  }
+}
+
 // while( expression ) { statement }
-func (p *Parser) parse_while() (*context.Node,error) {
+// until( expression ) { statement }
+// h is the actual NodeHandler to implement this
+func (p *Parser) parse_condLoop( h context.NodeHandler ) (*context.Node,error) {
   token := p.lexer.Next()
 
   // the condition
-  left, err := p.parse_parens()
+  left, err := p.ParseExpression()
   if err != nil {
     return nil, err
   }
@@ -57,7 +92,7 @@ func (p *Parser) parse_while() (*context.Node,error) {
     return nil, err
   }
 
-  expr := context.NewNode( token, exec.WhileHandler, left, right )
+  expr := context.NewNode( token, h, left, right )
 
   return expr, nil
 }

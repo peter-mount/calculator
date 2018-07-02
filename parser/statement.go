@@ -75,8 +75,14 @@ func (p *Parser) parse_statement() (*context.Node,error) {
     case "if":
       expr, err = p.parse_if()
 
+    case "do":
+      expr, err = p.parse_do()
+
+    case "until":
+      expr, err = p.parse_condLoop( exec.UntilHandler )
+
     case "while":
-      expr, err = p.parse_while()
+      expr, err = p.parse_condLoop( exec.WhileHandler )
 
     default:
       // Pass to setvar which will pass on to ParseExpression

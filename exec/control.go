@@ -9,6 +9,9 @@ var (
   noConditionError = errors.New( "No condition" )
 )
 
+func loopTrue(c bool) bool { return c }
+func loopFalse(c bool) bool { return !c }
+
 func evalCondition( m *context.Context, n *context.Node ) (bool,error) {
   if n == nil {
     return false, noConditionError
@@ -27,6 +30,42 @@ func evalCondition( m *context.Context, n *context.Node ) (bool,error) {
   return a.Bool(), nil
 }
 
+// common code for While/Until
+func whileLoop( m *context.Context, n *context.Node, f func(bool) bool ) error {
+  cond, err := evalCondition( m, n.Left() )
+  if err != nil {
+    return err
+  }
+
+  return doLoop( m, n, cond, f )
+}
+
+// Common code for DoWhile & DoUntil
+// cond initial value, f function to check cond if valud
+func doLoop( m *context.Context, n *context.Node, cond bool, f func(bool) bool ) error {
+  for f(cond) {
+    err := n.InvokeRhs( m )
+    if err != nil {
+      return err
+    }
+
+    cond, err = evalCondition( m, n.Left() )
+    if err != nil {
+      return err
+    }
+  }
+
+  return nil
+}
+
+func DoWhileHandler( m *context.Context, n *context.Node ) error {
+  return doLoop( m, n, true, loopTrue )
+}
+
+func DoUntilHandler( m *context.Context, n *context.Node ) error {
+  return doLoop( m, n, false, loopFalse )
+}
+
 func IfHandler( m *context.Context, n *context.Node ) error {
   cond, err := evalCondition( m, n.Left() )
   if err != nil {
@@ -43,22 +82,9 @@ func IfHandler( m *context.Context, n *context.Node ) error {
 }
 
 func WhileHandler( m *context.Context, n *context.Node ) error {
-  cond, err := evalCondition( m, n.Left() )
-  if err != nil {
-    return err
-  }
+  return whileLoop( m, n, loopTrue )
+}
 
-  for cond {
-    err = n.InvokeRhs( m )
-    if err != nil {
-      return err
-    }
-
-    cond, err = evalCondition( m, n.Left() )
-    if err != nil {
-      return err
-    }
-  }
-
-  return err
+func UntilHandler( m *context.Context, n *context.Node ) error {
+  return whileLoop( m, n, loopFalse )
 }
