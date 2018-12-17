@@ -62,7 +62,7 @@ ARG uploadCred=
 ARG uploadName=
 RUN if [ -n "${uploadCred}" -a -n "${uploadPath}" -a -n "${uploadName}" ] ;\
     then \
-      cd /dest/bin; \
+      cd /dest/usr/local/bin; \
       tar cvzpf /tmp/${uploadName}.tgz * && \
       zip /tmp/${uploadName}.zip * && \
       curl -u ${uploadCred} --upload-file /tmp/${uploadName}.tgz ${uploadPath}/ && \
