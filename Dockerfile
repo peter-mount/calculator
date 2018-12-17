@@ -9,24 +9,21 @@ FROM golang:alpine AS build
 # The golang alpine image is missing git so ensure we have additional tools
 RUN apk add --no-cache \
       curl \
-      git
-
-# Our build scripts
-ADD scripts/ /usr/local/bin/
-
-# Ensure we have the libraries - docker will cache these between builds
-RUN get.sh
-
-# Ensure we have the libraries - docker will cache these between builds
-#RUN go get -v \
-#      github.com/peter-mount/golib/... \
-#      gopkg.in/yaml.v2
+      git \
+      tzdata \
+      zip
 
 # ============================================================
 # source container contains the source as it exists within the
 # repository.
 FROM build AS source
-WORKDIR /go/src/github.com/peter-mount/calculator
+WORKDIR /work
+
+# Download dependencies before copying any sources then we
+# can use the docker cache to limit updates
+ADD go.mod .
+RUN go mod download
+
 ADD . .
 
 # ============================================================
@@ -34,7 +31,46 @@ ADD . .
 # the final build.
 FROM source as test
 ARG skipTest
-RUN if [ -z "$skipTest" ] ;then test.sh; fi
+WORKDIR /work
+RUN if [ -z "$skipTest" ] ;\
+    then \
+      for bin in test;\
+      do \
+        echo "Testing ${bin}";\
+        go test -v github.com/peter-mount/calculator/${bin};\
+      done;\
+    fi
 
-#FROM source as compile
-RUN compile.sh
+# ============================================================
+FROM source as compiler
+WORKDIR /work
+
+# NB: CGO_ENABLED=0 forces a static build
+RUN CGO_ENABLED=0 \
+    GOOS=${goos} \
+    GOARCH=${goarch} \
+    GOARM=${goarm} \
+    go build \
+      -o /dest/usr/local/bin/objectstore \
+      github.com/peter-mount/objectstore/bin
+
+# ============================================================
+# Optional stage, upload the binaries as a tar file
+FROM compiler AS upload
+ARG uploadPath=
+ARG uploadCred=
+ARG uploadName=
+RUN if [ -n "${uploadCred}" -a -n "${uploadPath}" -a -n "${uploadName}" ] ;\
+    then \
+      cd /dest/bin; \
+      tar cvzpf /tmp/${uploadName}.tgz * && \
+      zip /tmp/${uploadName}.zip * && \
+      curl -u ${uploadCred} --upload-file /tmp/${uploadName}.tgz ${uploadPath}/ && \
+      curl -u ${uploadCred} --upload-file /tmp/${uploadName}.zip ${uploadPath}/; \
+    fi
+
+# ============================================================
+# This is the final image
+FROM alpine
+RUN apk add --no-cache tzdata
+COPY --from=compiler /dest/ /
