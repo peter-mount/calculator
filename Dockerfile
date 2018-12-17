@@ -51,8 +51,8 @@ RUN CGO_ENABLED=0 \
     GOARCH=${goarch} \
     GOARM=${goarm} \
     go build \
-      -o /dest/usr/local/bin/objectstore \
-      github.com/peter-mount/objectstore/bin
+      -o /dest/usr/local/bin/calculator \
+      github.com/peter-mount/calculator/bin
 
 # ============================================================
 # Optional stage, upload the binaries as a tar file
