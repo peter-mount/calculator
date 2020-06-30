@@ -51,7 +51,7 @@ then
 
   if [ -z "${UPLOAD_PATH}" ]
   then
-    UPLOAD_PATH=https://nexus.area51.onl/repository/snapshots/
+    UPLOAD_PATH=https://nexus.area51.dev/repository/snapshots/
   fi
 
   repoPath=$JOB_NAME
